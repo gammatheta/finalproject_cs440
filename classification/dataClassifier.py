@@ -10,9 +10,9 @@
 # code for data classification
 
 import mostFrequent
-import naiveBayes
+# import naiveBayes
 import perceptron
-import mira
+# import mira
 import samples
 import sys
 import util
@@ -234,26 +234,26 @@ def readCommand( argv ):
 
   if(options.classifier == "mostFrequent"):
     classifier = mostFrequent.MostFrequentClassifier(legalLabels)
-  elif(options.classifier == "naiveBayes" or options.classifier == "nb"):
-    classifier = naiveBayes.NaiveBayesClassifier(legalLabels)
-    classifier.setSmoothing(options.smoothing)
-    if (options.autotune):
-        print("using automatic tuning for naivebayes")
-        classifier.automaticTuning = True
-    else:
-        print(f"using smoothing parameter k={options.smoothing} for naivebayes")
+  # elif(options.classifier == "naiveBayes" or options.classifier == "nb"):
+  #   classifier = naiveBayes.NaiveBayesClassifier(legalLabels)
+  #   classifier.setSmoothing(options.smoothing)
+  #   if (options.autotune):
+  #       print("using automatic tuning for naivebayes")
+  #       classifier.automaticTuning = True
+  #   else:
+  #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   elif(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
-  elif(options.classifier == "mira"):
-    classifier = mira.MiraClassifier(legalLabels, options.iterations)
-    if (options.autotune):
-        print("using automatic tuning for MIRA")
-        classifier.automaticTuning = True
-    else:
-        print("using default C=0.001 for MIRA")
-  elif(options.classifier == 'minicontest'):
-    import minicontest
-    classifier = minicontest.contestClassifier(legalLabels)
+  # elif(options.classifier == "mira"):
+  #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
+  #   if (options.autotune):
+  #       print("using automatic tuning for MIRA")
+  #       classifier.automaticTuning = True
+  #   else:
+  #       print("using default C=0.001 for MIRA")
+  # elif(options.classifier == 'minicontest'):
+  #   import minicontest
+  #   classifier = minicontest.contestClassifier(legalLabels)
   else:
     print("Unknown classifier:", options.classifier)
     print(USAGE_STRING)

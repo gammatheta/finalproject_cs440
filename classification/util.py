@@ -463,7 +463,7 @@ def pause():
   Pauses the output stream awaiting user feedback.
   """
   print("<Press enter/return to continue>")
-  raw_input()
+  # raw_input()
   
   
 ## code to handle timeouts
