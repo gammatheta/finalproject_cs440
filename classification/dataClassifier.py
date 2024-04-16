@@ -30,7 +30,7 @@ def basicFeatureExtractorDigit(datum):
   each pixel in the provided datum is white (0) or gray/black (1)
   """
   a = datum.getPixels()
-
+  print(datum.height)
   features = util.Counter()
   for x in range(DIGIT_DATUM_WIDTH):
     for y in range(DIGIT_DATUM_HEIGHT):
@@ -347,6 +347,6 @@ def runClassifier(args, options):
 
 if __name__ == '__main__':
   # Read input
-  args, options = readCommand( sys.argv[1:] ) 
+  args, options = readCommand(sys.argv[1:])
   # Run classifier
   runClassifier(args, options)

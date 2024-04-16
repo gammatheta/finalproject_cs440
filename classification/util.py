@@ -167,7 +167,7 @@ class Counter(dict):
     Returns the key with the highest value.
     """
     if len(self.keys()) == 0: return None
-    all = self.items()
+    all = list(self.items())
     values = [x[1] for x in all]
     maxIndex = values.index(max(values))
     return all[maxIndex][0]
@@ -455,8 +455,8 @@ def lookup(name, namespace):
     options = [getattr(module, name) for module in modules if name in dir(module)]
     options += [obj[1] for obj in namespace.items() if obj[0] == name ]
     if len(options) == 1: return options[0]
-    if len(options) > 1: raise Exception, 'Name conflict for %s'
-    raise Exception, '%s not found as a method or class' % name
+    if len(options) > 1: raise Exception(f'Name conflict for {options}')
+    raise Exception(f'{options} not found as a method or class')
 
 def pause():
   """

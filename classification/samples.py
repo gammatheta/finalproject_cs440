@@ -55,17 +55,18 @@ class Datum:
     Create a new datum from file input (standard MNIST encoding).
     """
     DATUM_HEIGHT = height
-    DATUM_WIDTH=width
+    DATUM_WIDTH= width
     self.height = DATUM_HEIGHT
     self.width = DATUM_WIDTH
     if data == None:
       data = [[' ' for i in range(DATUM_WIDTH)] for j in range(DATUM_HEIGHT)] 
-    self.pixels = util.arrayInvert(convertToInteger(data)) 
+    self.pixels = util.arrayInvert(convertToInteger(data))
     
   def getPixel(self, column, row):
     """
     Returns the value of the pixel at column, row as 0, or 1.
     """
+    print(self.pixels)
     return self.pixels[column][row]
       
   def getPixels(self):
@@ -122,7 +123,7 @@ def readlines(filename):
     return [l[:-1] for l in open(filename).readlines()]
   else: 
     z = zipfile.ZipFile('data.zip')
-    return z.read(filename).split('\n')
+    return z.read(filename).split(b"\n")
     
 def loadLabelsFile(filename, n):
   """
