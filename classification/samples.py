@@ -60,21 +60,22 @@ class Datum:
     self.width = DATUM_WIDTH
     if data == None:
       data = [[' ' for i in range(DATUM_WIDTH)] for j in range(DATUM_HEIGHT)] 
-    self.pixels = util.arrayInvert(convertToInteger(data))
+    self.pixels = util.arrayInvert(list(convertToInteger(data)))
     
   def getPixel(self, column, row):
     """
     Returns the value of the pixel at column, row as 0, or 1.
     """
-    print(self.pixels)
+    # print(self)
     return self.pixels[column][row]
-      
+
   def getPixels(self):
     """
     Returns all pixels as a list of lists.
     """
-    return self.pixels    
-      
+    # print(self.pixels)
+    return self.pixels
+
   def getAsciiString(self):
     """
     Renders the data item as an ascii image.
@@ -99,6 +100,7 @@ def loadDataFile(filename, n,width,height):
   
   (Return less then n items if the end of file is encountered).
   """
+  print(f"Using file location: {filename}")
   DATUM_WIDTH=width
   DATUM_HEIGHT=height
   fin = readlines(filename)
@@ -113,6 +115,7 @@ def loadDataFile(filename, n,width,height):
       print("Truncating at %d examples (maximum)" % i)
       break
     items.append(Datum(data,DATUM_WIDTH,DATUM_HEIGHT))
+  # print(f"items loaded from {filename}:\n{items[0].pixels}")
   return items
 
 import zipfile

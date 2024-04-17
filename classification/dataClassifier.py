@@ -30,7 +30,6 @@ def basicFeatureExtractorDigit(datum):
   each pixel in the provided datum is white (0) or gray/black (1)
   """
   a = datum.getPixels()
-  print(datum.height)
   features = util.Counter()
   for x in range(DIGIT_DATUM_WIDTH):
     for y in range(DIGIT_DATUM_HEIGHT):
@@ -45,6 +44,7 @@ def basicFeatureExtractorFace(datum):
   Returns a set of pixel features indicating whether
   each pixel in the provided datum is an edge (1) or no edge (0)
   """
+  # print(f"printing dataum:\n{datum}")
   a = datum.getPixels()
 
   features = util.Counter()
@@ -244,6 +244,7 @@ def readCommand( argv ):
   #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   elif(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
+    print("iterations: " + str(options.iterations))
   # elif(options.classifier == "mira"):
   #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
   #   if (options.autotune):

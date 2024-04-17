@@ -422,10 +422,14 @@ def arrayInvert(array):
   """
   Inverts a matrix stored as a list of lists.
   """
+  # print(f"current array:{list(list(array))}")
   result = [[] for i in array]
   for outer in array:
-    for inner in range(len(outer)):
+    outer = list(outer)
+    # print(f"processing outer: {list(outer)}")
+    for inner in range(len(list(outer))):
       result[inner].append(outer[inner])
+  # print(f"result of array invert{result[0]}")
   return result
 
 def matrixAsList( matrix, value = True ):
