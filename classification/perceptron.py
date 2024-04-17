@@ -40,18 +40,25 @@ class PerceptronClassifier:
     datum is a counter from features to values for those features
     (and thus represents a vector a values).
     """
-    # self.features = trainingData[0].keys() # could be useful later
+    self.features = list(trainingData)[0] # could be useful later
+    print(type(self.features))
     # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
     # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
-    trainingData_list = list(trainingData)
+    trainingData_list = self.features.copy()
     print(trainingData_list)
+    # print(trainingData_list)
     for iteration in range(self.max_iterations):
       print("Starting iteration ", iteration, "...")
-      for i in range(len(list(trainingData))):
+      for i in range(len(self.features)):
           "*** YOUR CODE HERE ***"
-          util.raiseNotDefined()
+          # util.raiseNotDefined()
+
     print("weights: " + str(self.weights))
     print("trained!")
+    # print(type(trainingData_list))
+    # print(type(trainingData))
+    # print(trainingData_list)
+
     
   def classify(self, data ):
     """
