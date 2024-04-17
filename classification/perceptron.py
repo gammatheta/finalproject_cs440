@@ -41,7 +41,7 @@ class PerceptronClassifier:
     (and thus represents a vector a values).
     """
     self.features = list(trainingData)[0] # could be useful later
-    print(type(self.features))
+    # print(type(self.features))
     # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
     # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
     trainingData_list = self.features.copy()
