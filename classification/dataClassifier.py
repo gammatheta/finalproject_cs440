@@ -9,7 +9,7 @@
 # This file contains feature extraction methods and harness 
 # code for data classification
 
-import mostFrequent
+# import mostFrequent
 # import naiveBayes
 import perceptron
 # import mira
@@ -232,8 +232,8 @@ def readCommand( argv ):
       print(USAGE_STRING)
       sys.exit(2)
 
-  if(options.classifier == "mostFrequent"):
-    classifier = mostFrequent.MostFrequentClassifier(legalLabels)
+  # if(options.classifier == "mostFrequent"):
+    # classifier = mostFrequent.MostFrequentClassifier(legalLabels)
   # elif(options.classifier == "naiveBayes" or options.classifier == "nb"):
   #   classifier = naiveBayes.NaiveBayesClassifier(legalLabels)
   #   classifier.setSmoothing(options.smoothing)
@@ -242,7 +242,7 @@ def readCommand( argv ):
   #       classifier.automaticTuning = True
   #   else:
   #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
-  elif(options.classifier == "perceptron"):
+  if(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
     print("iterations: " + str(options.iterations))
   # elif(options.classifier == "mira"):
