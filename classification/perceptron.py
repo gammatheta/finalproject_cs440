@@ -8,6 +8,7 @@
 
 # Perceptron implementation
 import util
+import random
 PRINT = True
 
 class PerceptronClassifier:
@@ -27,7 +28,7 @@ class PerceptronClassifier:
 
   def setWeights(self, weights):
     assert len(weights) == len(self.legalLabels)
-    self.weights == weights
+    self.weights = weights
       
   def train( self, trainingData, trainingLabels, validationData, validationLabels ):
     """
@@ -40,9 +41,15 @@ class PerceptronClassifier:
     datum is a counter from features to values for those features
     (and thus represents a vector a values).
     """
-    # for label in self.legalLabels:
-    #   self.weights[label] = 
+    
     self.features = list(trainingData) # could be useful later
+    
+    allkeys = self.features[0].keys()
+    for key in allkeys:
+      for label in self.legalLabels:
+        weight = random.random()
+        self.weights[label][key] = weight
+
     # trainingData_list = self.features[99]
     # print(type(self.features))
     # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
