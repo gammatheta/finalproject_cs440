@@ -55,6 +55,7 @@ class PerceptronClassifier:
       for key in allkeys:
         weight = random.random()
         self.weights[label][key] = weight
+      self.weights[label]['bias'] = 1 
 
     # trainingData_list = self.features[99]
     # print(type(self.features))
@@ -65,19 +66,27 @@ class PerceptronClassifier:
         
     print(f'Running for {self.max_iterations} minutes')
     t_end = time.time() + (60 * self.max_iterations)
-    while time.time() < t_end:
+    isTimeUp = False
+    while True:
+      
       for i in range(len(self.features)):
-      # i = random.randint(0,len(self.features)-1)
         "*** YOUR CODE HERE ***"
-        # util.raiseNotDefined()
-        # print(i)
+        if time.time() >= t_end:
+          isTimeUp = True
+          break
         trainingData_list = self.features[i]
         ans = trainingLabels[i]
         guess = self.classify(self.features)[i]
         if ans != guess:
           self.weights[guess] = self.weights[guess] - trainingData_list
+          self.weights[guess]['bias'] = self.weights[guess]['bias'] - 1
           self.weights[ans] = self.weights[ans] + trainingData_list
-    
+          self.weights[ans]['bias'] = self.weights[ans]['bias'] + 1
+      
+      if isTimeUp:
+        break
+
+
     # for iteration in range(self.max_iterations):
     #   print("Starting iteration ", iteration, "...")
     #   for i in range(len(self.features)):
@@ -109,7 +118,7 @@ class PerceptronClassifier:
     for datum in data:
       vectors = util.Counter()
       for l in self.legalLabels:
-        vectors[l] = self.weights[l] * datum
+        vectors[l] = (self.weights[l] * datum) + self.weights[l]['bias']
       guesses.append(vectors.argMax())
     return guesses
 
