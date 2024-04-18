@@ -9,6 +9,7 @@
 # Perceptron implementation
 import util
 import random
+import time
 PRINT = True
 
 class PerceptronClassifier:
@@ -45,8 +46,13 @@ class PerceptronClassifier:
     self.features = list(trainingData) # could be useful later
     
     allkeys = self.features[0].keys()
-    for key in allkeys:
-      for label in self.legalLabels:
+    # for key in allkeys:
+    #   for label in self.legalLabels:
+    #     weight = random.random()
+    #     self.weights[label][key] = weight
+
+    for label in self.legalLabels:
+      for key in allkeys:
         weight = random.random()
         self.weights[label][key] = weight
 
@@ -56,8 +62,9 @@ class PerceptronClassifier:
     # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
     # print(trainingData_list)
     # print(trainingData_list)
-    for iteration in range(self.max_iterations):
-      print("Starting iteration ", iteration, "...")
+    print(f'Running for {self.max_iterations} minutes')
+    t_end = time.time() + 60 * 15
+    while time.time() < t_end:
       for i in range(len(self.features)):
           "*** YOUR CODE HERE ***"
           # util.raiseNotDefined()
@@ -68,9 +75,22 @@ class PerceptronClassifier:
           if ans != guess:
             self.weights[guess] = self.weights[guess] - trainingData_list
             self.weights[ans] = self.weights[ans] + trainingData_list
+    
+    # for iteration in range(self.max_iterations):
+    #   print("Starting iteration ", iteration, "...")
+    #   for i in range(len(self.features)):
+    #       "*** YOUR CODE HERE ***"
+    #       # util.raiseNotDefined()
+    #       # print(i)
+    #       trainingData_list = self.features[i]
+    #       ans = trainingLabels[i]
+    #       guess = self.classify(self.features)[i]
+    #       if ans != guess:
+    #         self.weights[guess] = self.weights[guess] - trainingData_list
+    #         self.weights[ans] = self.weights[ans] + trainingData_list
 
-    print("weights: " + str(self.weights))
-    print("trained!")
+    # print("weights: " + str(self.weights))
+    # print("trained!")
     # print(type(trainingData_list))
     # print(type(trainingData))
     # print(trainingData_list)
