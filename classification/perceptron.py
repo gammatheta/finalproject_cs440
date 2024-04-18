@@ -62,19 +62,21 @@ class PerceptronClassifier:
     # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
     # print(trainingData_list)
     # print(trainingData_list)
+        
     print(f'Running for {self.max_iterations} minutes')
-    t_end = time.time() + 60 * 15
+    t_end = time.time() + (60 * self.max_iterations)
     while time.time() < t_end:
       for i in range(len(self.features)):
-          "*** YOUR CODE HERE ***"
-          # util.raiseNotDefined()
-          # print(i)
-          trainingData_list = self.features[i]
-          ans = trainingLabels[i]
-          guess = self.classify(self.features)[i]
-          if ans != guess:
-            self.weights[guess] = self.weights[guess] - trainingData_list
-            self.weights[ans] = self.weights[ans] + trainingData_list
+      # i = random.randint(0,len(self.features)-1)
+        "*** YOUR CODE HERE ***"
+        # util.raiseNotDefined()
+        # print(i)
+        trainingData_list = self.features[i]
+        ans = trainingLabels[i]
+        guess = self.classify(self.features)[i]
+        if ans != guess:
+          self.weights[guess] = self.weights[guess] - trainingData_list
+          self.weights[ans] = self.weights[ans] + trainingData_list
     
     # for iteration in range(self.max_iterations):
     #   print("Starting iteration ", iteration, "...")
