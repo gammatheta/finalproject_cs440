@@ -9,6 +9,7 @@
 import sys
 import inspect
 import heapq, random
+import re
 
 
 """
@@ -316,6 +317,47 @@ class Counter(dict):
         continue
       addend[key] = -1 * y[key]
     return addend
+  
+  def multiplyAll(self, val):
+    clone = self.copy()
+    for key in clone.keys():
+      clone[key] *= val
+    return clone
+  
+  def parse_weights(filename):
+    prior = {}
+    key = 0
+
+    with open(filename, 'r') as f:
+      lines = f.readlines()
+      for i in range(0, len(lines)-1, 2):
+        line = lines[i]
+        key = int(line[0])
+        line = lines[i+1]
+
+        vals = Counter.parse_vals(line)
+        prior[key] = vals
+        # print(parts)
+        
+    return prior
+  
+  def parse_vals(line):
+    res = Counter()
+    parts = line.split(';')
+    chars = "() "
+    for i in range(0, len(parts), 2):
+      if parts[i] == '\n': continue
+      for char in chars:
+        parts[i] = parts[i].replace(char, '')
+      part = parts[i].split(',')
+      if part[0] == 'bias': key = 'bias'
+      else: key = (int(part[0]), int(part[1]))
+      # print(f"parsed key: {key}, type: {type(key)}")
+      val = float(parts[i+1])
+      # print(f"parsed val: {val}, type: {type(val)}")
+      res[key] = val
+    
+    return res
     
 def raiseNotDefined():
   print("Method not implemented: %s" % inspect.stack()[1][3])
