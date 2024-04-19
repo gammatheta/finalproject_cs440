@@ -11,8 +11,9 @@ import util
 import random
 import time
 PRINT = True
-STREAK_REQUIREMENT = 0.75
-TRAIN_VALUE = 0.9
+STREAK_REQUIREMENT = 0.7
+TRAIN_VALUE = 1
+TRAIN_VALUE_MODIFIER = 0.95
 
 class PerceptronClassifier:
   """
@@ -70,47 +71,54 @@ class PerceptronClassifier:
     isTimeUp = False
     amtNeeded = int(STREAK_REQUIREMENT * len(self.features))
     learnRate = TRAIN_VALUE
-    while True:
-      for i in range(len(self.features)):
-        "*** YOUR CODE HERE ***"
-        if time.time() >= t_end or streak == amtNeeded:
-          isTimeUp = True
-          break
-        trainingData_list = self.features[i]
-        ans = trainingLabels[i]
-        guess = self.classify(self.features)[i]
-        if ans != guess:
-          streak = 0
-          self.weights[guess] = self.weights[guess] - trainingData_list.multiplyAll(learnRate)
-          self.weights[guess]['bias'] = self.weights[guess]['bias'] - 1
-          self.weights[ans] = self.weights[ans] + trainingData_list.multiplyAll(learnRate)
-          self.weights[ans]['bias'] = self.weights[ans]['bias'] + 1
-        else:
-          streak += 1
-      learnRate = 0.9* learnRate
-      if isTimeUp:
-        break
-
-      with open('weights.txt', 'w') as f:
-        for label, weight in self.weights.items():
-          f.write(f"{label}:\n{weight}\n")
-        f.close
-    # for iteration in range(self.max_iterations):
-    #   print("Starting iteration ", iteration, "...")
+    # iteration = 0
+    # while True:
+    #   streak = 0
+      
     #   for i in range(len(self.features)):
-    #       "*** YOUR CODE HERE ***"
-    #       # util.raiseNotDefined()
-    #       # print(i)
-    #       trainingData_list = self.features[i]
-    #       ans = trainingLabels[i]
-    #       guess = self.classify(self.features)[i]
-    #       if ans != guess:
-    #         self.weights[guess] = self.weights[guess] - trainingData_list
-    #         self.weights[ans] = self.weights[ans] + trainingData_list
+    #     "*** YOUR CODE HERE ***"
+    #     if time.time() >= t_end or streak == amtNeeded:
+    #       isTimeUp = True
+    #       break
+    #     trainingData_list = self.features[i]
+    #     ans = trainingLabels[i]
+    #     guess = self.classify(self.features)[i]
+    #     if ans != guess:
+    #       self.weights[guess] = self.weights[guess] - trainingData_list.multiplyAll(learnRate)
+    #       self.weights[guess]['bias'] = self.weights[guess]['bias'] - 1
+    #       self.weights[ans] = self.weights[ans] + trainingData_list.multiplyAll(learnRate)
+    #       self.weights[ans]['bias'] = self.weights[ans]['bias'] + 1
+    #     else:
+    #       streak += 1
+    #   learnRate = TRAIN_VALUE_MODIFIER * learnRate
+      
+    #   if isTimeUp:
+    #     break
 
+
+    for iteration in range(self.max_iterations):
+      print("Starting iteration ", iteration, "...")
+      for i in range(len(self.features)):
+          "*** YOUR CODE HERE ***"
+          # util.raiseNotDefined()
+          # print(i)
+          trainingData_list = self.features[i]
+          ans = trainingLabels[i]
+          guess = self.classify(self.features)[i]
+          if ans != guess:
+            self.weights[guess] = self.weights[guess] - trainingData_list.multiplyAll(learnRate)
+            self.weights[guess]['bias'] = self.weights[guess]['bias'] - 1
+            self.weights[ans] = self.weights[ans] + trainingData_list.multiplyAll(learnRate)
+            self.weights[ans]['bias'] = self.weights[ans]['bias'] + 1
+      learnRate = TRAIN_VALUE_MODIFIER * learnRate
     # print("weights: " + str(self.weights))
     # print("trained!")
     
+    with open('weights.txt', 'w') as f:
+      for label, weight in self.weights.items():
+        f.write(f"{label}:\n{weight}\n")
+      f.close
+
   def classify(self, data ):
     """
     Classifies each datum as the label that most closely matches the prototype vector
