@@ -11,6 +11,8 @@ import util
 import random
 import time
 PRINT = True
+STREAK_REQUIREMENT = 0.75
+TRAIN_VALUE = 0.9
 
 class PerceptronClassifier:
   """
@@ -50,43 +52,49 @@ class PerceptronClassifier:
     #   for label in self.legalLabels:
     #     weight = random.random()
     #     self.weights[label][key] = weight
+    # for label in self.legalLabels:
+    #   self.weights[label]['bias'] = 1
 
     for label in self.legalLabels:
       for key in allkeys:
         weight = random.random()
         self.weights[label][key] = weight
       self.weights[label]['bias'] = 1 
-
-    # trainingData_list = self.features[99]
-    # print(type(self.features))
+      
     # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
     # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
-    # print(trainingData_list)
-    # print(trainingData_list)
-        
+
+    streak = 0    
     print(f'Running for {self.max_iterations} minutes')
     t_end = time.time() + (60 * self.max_iterations)
     isTimeUp = False
+    amtNeeded = int(STREAK_REQUIREMENT * len(self.features))
+    learnRate = TRAIN_VALUE
     while True:
-      
       for i in range(len(self.features)):
         "*** YOUR CODE HERE ***"
-        if time.time() >= t_end:
+        if time.time() >= t_end or streak == amtNeeded:
           isTimeUp = True
           break
         trainingData_list = self.features[i]
         ans = trainingLabels[i]
         guess = self.classify(self.features)[i]
         if ans != guess:
-          self.weights[guess] = self.weights[guess] - trainingData_list
+          streak = 0
+          self.weights[guess] = self.weights[guess] - trainingData_list.multiplyAll(learnRate)
           self.weights[guess]['bias'] = self.weights[guess]['bias'] - 1
-          self.weights[ans] = self.weights[ans] + trainingData_list
+          self.weights[ans] = self.weights[ans] + trainingData_list.multiplyAll(learnRate)
           self.weights[ans]['bias'] = self.weights[ans]['bias'] + 1
-      
+        else:
+          streak += 1
+      learnRate = 0.9* learnRate
       if isTimeUp:
         break
 
-
+      with open('weights.txt', 'w') as f:
+        for label, weight in self.weights.items():
+          f.write(f"{label}:\n{weight}\n")
+        f.close
     # for iteration in range(self.max_iterations):
     #   print("Starting iteration ", iteration, "...")
     #   for i in range(len(self.features)):
@@ -102,10 +110,6 @@ class PerceptronClassifier:
 
     # print("weights: " + str(self.weights))
     # print("trained!")
-    # print(type(trainingData_list))
-    # print(type(trainingData))
-    # print(trainingData_list)
-
     
   def classify(self, data ):
     """
