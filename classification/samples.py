@@ -94,7 +94,7 @@ class Datum:
 
 # Data processing, cleanup and display functions
     
-def loadDataFile(filename, n,width,height):
+def loadDataFile(filename,n,width,height):
   """
   Reads n data images from a file and returns a list of Datum objects.
   
@@ -106,6 +106,7 @@ def loadDataFile(filename, n,width,height):
   fin = readlines(filename)
   fin.reverse()
   items = []
+  print(f"height: {height} vs width: {width} vs n: {n}")
   for i in range(n):
     data = []
     for j in range(height):
