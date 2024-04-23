@@ -9,10 +9,8 @@
 # This file contains feature extraction methods and harness 
 # code for data classification
 
-# import mostFrequent
-# import naiveBayes
 import perceptron
-# import mira
+import neuralnetwork
 import samples
 import sys
 import util
@@ -165,7 +163,7 @@ def readCommand( argv ):
   from optparse import OptionParser  
   parser = OptionParser(USAGE_STRING)
   
-  parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['mostFrequent', 'nb', 'naiveBayes', 'perceptron', 'mira', 'minicontest'], default='mostFrequent')
+  parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['perceptron', 'neural'], default='perceptron')
   parser.add_option('-d', '--data', help=default('Dataset to use'), choices=['digits', 'faces'], default='digits')
   parser.add_option('-t', '--training', help=default('The size of the training set'), default=100, type="int")
   parser.add_option('-f', '--features', help=default('Whether to use enhanced features'), default=False, action="store_true")
@@ -244,7 +242,9 @@ def readCommand( argv ):
   #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   if(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
-    print("iterations: " + str(options.iterations))
+  # print("iterations: " + str(options.iterations))
+  elif(options.classifier == "neural"):
+    classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels, options.iterations)
   # elif(options.classifier == "mira"):
   #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
   #   if (options.autotune):
@@ -341,6 +341,12 @@ def runClassifier(args, options):
     printImage(features_odds)
 
   if((options.weights) & (options.classifier == "perceptron")):
+    for l in classifier.legalLabels:
+      features_weights = classifier.findHighWeightFeatures(l)
+      print ("=== Features with high weight for label %d ==="%l)
+      printImage(features_weights)
+
+  if((options.weights) & (options.classifier == "neural")):
     for l in classifier.legalLabels:
       features_weights = classifier.findHighWeightFeatures(l)
       print ("=== Features with high weight for label %d ==="%l)

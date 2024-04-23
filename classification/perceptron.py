@@ -10,7 +10,6 @@
 import util
 import random
 import time
-import string
 PRINT = True
 STREAK_REQUIREMENT = 0.75
 TRAIN_VALUE = 0.9
@@ -90,13 +89,14 @@ class PerceptronClassifier:
     while True:
       # print(f'beginning iteration {iteration}...')
       guesses = self.classify(self.features)
+      if time.time() >= t_end:
+          isTimeUp = True
+          break
       for i in range(len(self.features)):
         # print(f"Beginning feature {i}")
         # "*** YOUR CODE HERE ***"
         # print(f"feature #{i};")
-        if time.time() >= t_end:
-          isTimeUp = True
-          break
+        
         trainingData_list = self.features[i]
         ans = trainingLabels[i]
         guess = guesses[i]
