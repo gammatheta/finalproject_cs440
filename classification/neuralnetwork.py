@@ -11,13 +11,12 @@ FACE_DATUM_WIDTH=60
 FACE_DATUM_HEIGHT=70
 STREAK_REQUIREMENT = 0.75
 TRAIN_VALUE = 0.9
+READ = False
 
 class NeuralNetworkClassifier:
     def __init__(self, legalLabels, max_iterations):
         self.labels = legalLabels
         self.max_iterations = max_iterations
-        self.layerOneWeights = {}
-        self.layerTwoWeights = {}
         
         # determine amount of units each layer has
         if len(legalLabels) == 2:
@@ -30,15 +29,14 @@ class NeuralNetworkClassifier:
             self.outputUnits = 10
 
         # set random weights for each layer 
-        for label in legalLabels:
-            self.layerOneWeights[label] = np.random.rand(self.hiddenUnits,self.inputUnits+1)
-            self.layerTwoWeights[label] = np.random.rand(self.outputUnits,self.hiddenUnits+1)
+        self.layerOneWeights = np.random.rand(self.hiddenUnits,self.inputUnits+1)
+        self.layerTwoWeights = np.random.rand(self.outputUnits,self.hiddenUnits+1)
 
     def setWeights(self, weights):
         assert len(weights) == len(self.legalLabels)
         self.weights = weights
-    
-    def activation_function():
+
+    def backpropagate():
         pass
     
     def train(self, trainingData, trainingLabels, validationData, validationLabels):
@@ -48,16 +46,14 @@ class NeuralNetworkClassifier:
             i.e: [{(0,0) = 1 , (0,1) = 0}, ... ] -> [[1,0], ...]
         
         """
-        # filename = 'faceweights.txt' if len(self.legalLabels) == 2 else 'digitweights.txt'
-        # with open('initial_weights.txt', 'w') as f:
-        #     for label, weight in self.weights.items():
-        #         f.write(f"{label}:\n{weight}\n")
-        #     f.close
+        # read from weights file to do training
+        if READ:
+            pass
 
         self.features = list(trainingData)
         listOfAllDataPoints = []
         for i in range(len(self.features)):
-            listOfAllDataPoints.append(self.features[i].values())
+            listOfAllDataPoints.append(list(self.features[i].values()))
         npArrOfInputDataPoints = []
         for points in listOfAllDataPoints:
             npArrOfInputDataPoints.append(np.array([1]+points).reshape(-1,1))
@@ -74,31 +70,47 @@ class NeuralNetworkClassifier:
                     break
                 ans = trainingLabels[i]
                 inputLayer = npArrOfInputDataPoints[i]
-                hiddenLayer = np.dot()
-                guess = guesses[i]
+                # calculate hidden layer
+                hiddenLayer = np.dot(self.layerOneWeights, inputLayer)
+                hiddenLayer = 1/(1+np.exp(-1*hiddenLayer))
+                hiddenLayer = np.insert(hiddenLayer, 0, 1).reshape(-1,1)
+                # calculate output layer
+                outputLayer = np.dot(self.layerTwoWeights, hiddenLayer)
+                outputLayer = 1/(1 + np.exp(-1*outputLayer))
+                outputLayer = outputLayer.reshape(-1,1)
+                # take a guess
+                guess = np.argmax(outputLayer)
                 
                 if ans != guess:
+                    # print(f'Incorrect answer: ans was {ans} and guess was {guess}')
                     pass
             if isTimeUp:
                 break
-
-        # print("trained!")
-        # with open(filename, 'w') as f:
-        #     for label, weights in self.weights.items():
-        #         f.write(f"{label}:\n")
-        #         for key,weight in weights.items():
-        #             f.write(f"{key};{weight};")
-        #             f.write("\n")
-        #     f.close
-        # with open("initial_weights.txt") as i, open(filename) as w: 
-        #     initial = i.readlines()
-        #     after = w.readlines()
-        #     if initial == after:
-        #         print("no update in weights after iterations")
-        #     else:
-        #         print("weights were updated")
-        #     i.close()
-        #     w.close()
+        
+        np.savetxt('digitweights1-nn.txt',self.layerOneWeights,fmt='%.4f',delimiter=',')
+        np.savetxt('digitweights2-nn.txt',self.layerTwoWeights,fmt='%.4f',delimiter=',')
+    
 
     def classify(self, data):
-        pass
+        """
+        Classifies each datum as the label that most closely matches the prototype vector
+        for that label.
+        
+        Recall that a datum is a util.counter... 
+        """
+        guesses = []
+        
+        for datum in data:
+            inputLayer = np.array([1]+list(datum.values())).reshape(-1,1)
+            # calculate hidden layer
+            hiddenLayer = np.dot(self.layerOneWeights, inputLayer)
+            hiddenLayer = 1/(1+np.exp(-1*hiddenLayer))
+            hiddenLayer = np.insert(hiddenLayer, 0, 1).reshape(-1,1)
+            # calculate output layer
+            outputLayer = np.dot(self.layerTwoWeights, hiddenLayer)
+            outputLayer = 1/(1 + np.exp(-1*outputLayer))
+            outputLayer = outputLayer.reshape(-1,1)
+            # take a guess
+            guess = np.argmax(outputLayer)
+            guesses.append(guess) 
+        return guesses

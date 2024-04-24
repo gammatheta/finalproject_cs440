@@ -16,6 +16,7 @@ import perceptron
 import samples
 import sys
 import util
+import neuralnetwork
 
 TEST_SET_SIZE = 100
 DIGIT_DATUM_WIDTH=28
@@ -165,7 +166,7 @@ def readCommand( argv ):
   from optparse import OptionParser  
   parser = OptionParser(USAGE_STRING)
   
-  parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['mostFrequent', 'nb', 'naiveBayes', 'perceptron', 'mira', 'minicontest'], default='mostFrequent')
+  parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['mostFrequent', 'nb', 'naiveBayes', 'perceptron', 'neuralnetwork', 'minicontest'], default='mostFrequent')
   parser.add_option('-d', '--data', help=default('Dataset to use'), choices=['digits', 'faces'], default='digits')
   parser.add_option('-t', '--training', help=default('The size of the training set'), default=100, type="int")
   parser.add_option('-f', '--features', help=default('Whether to use enhanced features'), default=False, action="store_true")
@@ -244,6 +245,9 @@ def readCommand( argv ):
   #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   if(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
+    print("iterations: " + str(options.iterations))
+  elif(options.classifier == "neuralnetwork"):
+    classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels,options.iterations)
     print("iterations: " + str(options.iterations))
   # elif(options.classifier == "mira"):
   #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
