@@ -118,6 +118,7 @@ class PerceptronClassifier:
         break
 
     print("trained!")
+    '''
     with open(filename, 'w') as f:
       for label, weights in self.weights.items():
         f.write(f"{label}:\n")
@@ -134,6 +135,7 @@ class PerceptronClassifier:
         print("weights were updated")
     i.close()
     w.close()
+    '''
     
     
 

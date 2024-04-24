@@ -9,6 +9,13 @@
 # This file contains feature extraction methods and harness 
 # code for data classification
 
+<<<<<<< Updated upstream
+=======
+# import mostFrequent
+# import naiveBayes
+import collections
+import numpy as np
+>>>>>>> Stashed changes
 import perceptron
 import neuralnetwork
 import samples
@@ -112,6 +119,7 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   # Example of use:
   for i in range(len(guesses)):
       prediction = guesses[i]
+      print(prediction)
       truth = testLabels[i]
       if (prediction != truth):
           print("===================================")
@@ -242,9 +250,16 @@ def readCommand( argv ):
   #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   if(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
+<<<<<<< Updated upstream
   # print("iterations: " + str(options.iterations))
   elif(options.classifier == "neural"):
     classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels, options.iterations)
+=======
+    print("iterations: " + str(options.iterations) + "mins")
+  elif(options.classifier == "neural"):
+    classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels,options.iterations)
+    print("iterations: " + str(options.iterations) + "mins")
+>>>>>>> Stashed changes
   # elif(options.classifier == "mira"):
   #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
   #   if (options.autotune):
@@ -320,14 +335,17 @@ def runClassifier(args, options):
   classifier.train(trainingData, trainingLabels, validationData, validationLabels)
   print("Validating...")
   guesses = classifier.classify(validationData)
-  correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+  if isinstance(guesses, np.ndarray): correct = [np.all(guesses[i] == validationLabels[i]) for i in range(len(validationLabels))].count(True)
+  else: correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
   print(f"{str(correct)} correct out of {str(len(validationLabels))} ({100.0 * correct / len(validationLabels):.1f}).")
   print("Testing...")
   guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
+  if isinstance(guesses, np.ndarray): correct = [np.all(guesses[i] == testLabels[i]) for i in range(len(testLabels))].count(True)
+  else: correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
   print(f"{str(correct)} correct out of {str(len(testLabels))} ({100.0 * correct / len(testLabels):.1f}).")
   analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   
+  '''
   # do odds ratio computation if specified at command line
   if((options.odds) & (options.classifier == "naiveBayes" or (options.classifier == "nb")) ):
     label1, label2 = options.label1, options.label2
@@ -339,8 +357,14 @@ def runClassifier(args, options):
       
     print(string3)
     printImage(features_odds)
+'''
 
   if((options.weights) & (options.classifier == "perceptron")):
+    for l in classifier.legalLabels:
+      features_weights = classifier.findHighWeightFeatures(l)
+      print ("=== Features with high weight for label %d ==="%l)
+      printImage(features_weights)
+  elif((options.weights) & (options.classifier == "neural")):
     for l in classifier.legalLabels:
       features_weights = classifier.findHighWeightFeatures(l)
       print ("=== Features with high weight for label %d ==="%l)
