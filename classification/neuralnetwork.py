@@ -12,6 +12,8 @@ FACE_DATUM_HEIGHT=70
 STREAK_REQUIREMENT = 0.75
 TRAIN_VALUE = 0.9
 READ = False
+LAMBDA = 0.03
+ALPHA = 0.01
 
 class NeuralNetworkClassifier:
     def __init__(self, legalLabels, max_iterations):
@@ -62,8 +64,12 @@ class NeuralNetworkClassifier:
         t_end = time.time() + (60 * self.max_iterations)
         isTimeUp = False
         iteration = 0
-
+        
         while True:
+            self.D1 = np.zeros((self.hiddenUnits,self.hiddenUnits+1))
+            self.D2 = np.zeros((self.outputUnits,self.hiddenUnits+1))
+            self.gradientLayerOne = np.zeros((self.hiddenUnits,self.hiddenUnits+1))
+            self.gradientLayerTwo = np.zeros((self.outputUnits,self.hiddenUnits+1))
             for i in range(len(npArrOfInputDataPoints)):
                 if time.time() >= t_end:
                     isTimeUp = True
@@ -82,13 +88,48 @@ class NeuralNetworkClassifier:
                 guess = np.argmax(outputLayer)
                 
                 if ans != guess:
-                    # print(f'Incorrect answer: ans was {ans} and guess was {guess}')
-                    pass
+                    answerVector = np.zeros(self.outputUnits).reshape(-1,1)
+                    answerVector[ans] = 1
+                    deltaLayerThree = outputLayer - answerVector
+                    # print(f'shape of deltaLayerThree is {deltaLayerThree.shape}')
+                    # print(f'shape of layer2weights is {self.layerTwoWeights.shape}')
+                    # print(f'shape of layer1weights is {self.layerOneWeights.shape}')
+                    # print(f'shape of hiddenlayer is {hiddenLayer.shape}')
+                    deltaLayerTwo = np.dot(self.layerTwoWeights.T,deltaLayerThree)
+                    # print(f'shape of deltaLayer2 is {deltaLayerTwo.shape}')
+                    gprime = np.multiply(hiddenLayer, (1-hiddenLayer))
+                    # print(f'shape of gprime is {gprime.shape}')
+                    deltaLayerTwo = np.multiply(deltaLayerTwo,gprime)
+                    deltaLayerTwo = deltaLayerTwo[1:]
+                    # print(f'shape of deltaLayer2 is {deltaLayerTwo.shape}')
+
+                    self.gradientLayerOne = self.gradientLayerOne + np.dot(deltaLayerTwo,inputLayer.T)
+                    self.gradientLayerTwo = self.gradientLayerTwo + np.dot(deltaLayerThree,hiddenLayer.T)
+                    # print(f'shape of gradient1 is {self.gradientLayerOne.shape}')
+                    # print(f'shape of gradient2 is {self.gradientLayerTwo.shape}')
+                    # print(f'Incorrect answer: ans was {ans} and guess was {guess} from guessing {outputLayer}')
+
+            # compute avg regularized gradient
+            for i in range(self.D1.shape[0]):
+                for j in range(self.D1.shape[1]):
+                    if j == 0:
+                        self.D1[i, j] =  1/(len(npArrOfInputDataPoints)) * self.gradientLayerOne[i,j] 
+                    else:
+                        self.D1[i, j] =  (1/(len(npArrOfInputDataPoints)) * self.gradientLayerOne[i,j]) + (LAMBDA * self.layerOneWeights[i,j])
+            
+            for i in range(self.D2.shape[0]):
+                for j in range(self.D2.shape[1]):
+                    if j == 0:
+                        self.D2[i, j] =  1/(len(npArrOfInputDataPoints)) * self.gradientLayerTwo[i,j] 
+                    else:
+                        self.D2[i, j] =  (1/(len(npArrOfInputDataPoints)) * self.gradientLayerTwo[i,j]) + (LAMBDA * self.layerTwoWeights[i,j])
+            self.layerOneWeights = self.layerOneWeights - (ALPHA * self.D1)
+            self.layerTwoWeights = self.layerTwoWeights - (ALPHA * self.D2)
             if isTimeUp:
                 break
         
-        np.savetxt('digitweights1-nn.txt',self.layerOneWeights,fmt='%.4f',delimiter=',')
-        np.savetxt('digitweights2-nn.txt',self.layerTwoWeights,fmt='%.4f',delimiter=',')
+        # np.savetxt('digitweights1-nn.txt',self.layerOneWeights,fmt='%.4f',delimiter=',')
+        # np.savetxt('digitweights2-nn.txt',self.layerTwoWeights,fmt='%.4f',delimiter=',')
     
 
     def classify(self, data):
