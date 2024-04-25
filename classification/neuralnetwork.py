@@ -11,15 +11,18 @@ class NeuralNetworkClassifier:
         self.legalLabels = legalLabels
         self.type = "neuralnetwork"
         self.max_iterations = max_iterations
+        self.bias = 1
         self.weights1 = np.array([])
         self.weights2 = np.array([])
 
     def train(self, trainingData, trainingLabels, validationData, validationLabels):        
         training_arr = self.counter_to_array(list(trainingData))
-        # print(f"counter to array returned an array in shape of: {training_arr.shape}")
-        self.weights1 = np.random.rand(training_arr.shape[0],training_arr.shape[1])
-        self.weights2 = np.random.rand(10,training_arr.shape[0])
-        
+        print(f"counter to array returned an array in shape of: {training_arr.shape}")
+        self.weights1 = np.random.rand(training_arr.shape[1],training_arr.shape[0]*2)
+        self.weights2 = np.random.rand(self.weights1.shape[1],len(self.legalLabels))
+        # self.bias = np.ones((1,training_arr.shape[1]))
+        print(f"shape of weights1: {self.weights1.shape}")
+        print(f"shape of weights2: {self.weights2.shape}")
         # print(f"activation returned hidden layer shape: {hidden_layer.shape}")
         # self.classify(hidden_layer)
         # print(training_arr)
@@ -37,15 +40,20 @@ class NeuralNetworkClassifier:
             datum = self.counter_to_array(datum)
         # print(f"shape of data passed in: {datum.shape}")
         # if type(datum)
-        v =  np.dot(self.weights1, datum.T)
+        v =  np.dot(datum, self.weights1) + self.bias
         hidden_layer = np.maximum(0,v)
-        # np.savetxt('neuronhidden.txt', hidden_layer, fmt='%f', delimiter=' ')
+        np.savetxt('neuronvectors.txt', v, fmt='%f', delimiter=' ')
+        np.savetxt('neuronhidden.txt', hidden_layer, fmt='%f', delimiter=' ')
 
-        v = np.dot(self.weights2, hidden_layer) # potentially incorrect due to self.weights2's shape and value placement
-        output_layer = np.maximum(0,v).T
-        
+        v = np.dot(hidden_layer, self.weights2) + 1 # potentially incorrect due to self.weights2's shape and value placement
+        output_layer = np.maximum(0,v)
+        if output_layer.shape[0] > 100:
+            np.savetxt('neuronoutput.txt', output_layer, fmt='%f', delimiter=' ')
+        print(f"shape of neuron output: {output_layer.shape}")
+
         guesses = np.argmax(output_layer, axis=1)
-
+        if guesses.shape[0] > 100:
+            np.savetxt('neuronguesses.txt', guesses, fmt='%i', delimiter=' ')
         return guesses
     '''
     def classify(self, datum):

@@ -9,13 +9,10 @@
 # This file contains feature extraction methods and harness 
 # code for data classification
 
-<<<<<<< Updated upstream
-=======
 # import mostFrequent
 # import naiveBayes
 import collections
 import numpy as np
->>>>>>> Stashed changes
 import perceptron
 import neuralnetwork
 import samples
@@ -250,16 +247,14 @@ def readCommand( argv ):
   #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   if(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
-<<<<<<< Updated upstream
   # print("iterations: " + str(options.iterations))
   elif(options.classifier == "neural"):
     classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels, options.iterations)
-=======
+
     print("iterations: " + str(options.iterations) + "mins")
   elif(options.classifier == "neural"):
     classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels,options.iterations)
     print("iterations: " + str(options.iterations) + "mins")
->>>>>>> Stashed changes
   # elif(options.classifier == "mira"):
   #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
   #   if (options.autotune):
