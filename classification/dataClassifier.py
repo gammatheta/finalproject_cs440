@@ -116,7 +116,6 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   # Example of use:
   for i in range(len(guesses)):
       prediction = guesses[i]
-      print(prediction)
       truth = testLabels[i]
       if (prediction != truth):
           print("===================================")
