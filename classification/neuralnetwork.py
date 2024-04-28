@@ -3,6 +3,8 @@ import time
 import numpy as np
 import collections
 PRINT = True
+learning_rate = 0.01
+regularization = 0.01
 
 class NeuralNetworkClassifier:
     def __init__(self, legalLabels, max_iterations):
@@ -18,10 +20,12 @@ class NeuralNetworkClassifier:
 
     def train(self, trainingData, trainingLabels, validationData, validationLabels):        
         training_arr = self.counter_to_array(list(trainingData))
+        datasize = training_arr.shape[0]
+        pixel_size = training_arr.shape[1]
         hidden_size = 512
         output_size = len(self.legalLabels)
-        self.weights1 = np.random.randn(training_arr.shape[1],hidden_size) * np.sqrt(2 / hidden_size)
-        self.weights2 = np.random.randn(self.weights1.shape[1],output_size) * np.sqrt(2 / self.weights1.shape[1])
+        self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
+        self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
         bin_tlabels = self.to_binary(trainingLabels)        
 
         # print(f"shape of weights1: {self.weights1.shape}")
@@ -30,8 +34,8 @@ class NeuralNetworkClassifier:
         # self.classify(hidden_layer)
         # print(training_arr)
         countdown = time.time() + (self.max_iterations * 60)
-        # gradients1 = np.zeros((hidden_size, output_size))
-        gradients2 = np.zeros((hidden_size, output_size))
+        gradients1 = np.zeros((hidden_size, pixel_size))
+        gradients2 = np.zeros((output_size, hidden_size))
         timer = True
         correct = 0
         i = 0
@@ -41,30 +45,39 @@ class NeuralNetworkClassifier:
             np.savetxt('neuronhidden.txt', self.hidden_layer, fmt='%f', delimiter=' ')
             np.savetxt('neuronoutput.txt', self.output_layer, fmt='%f', delimiter=' ')
             '''
-            
+            # print(f"shape of weights1: {self.weights1.shape}")
+            # print(f"shape of weights2: {self.weights2.shape}")
+            # print(f"shape of hidden layer: {self.hidden_layer.shape}")
+            # print(f"shape of output layer: {self.output_layer.shape}")
+
             # output_loss = self.cost_func(self.output_layer, bin_tlabels)
             # np.savetxt('neuronloss.txt', loss, fmt='%f', delimiter=' ')
-            delta = self.output_layer - bin_tlabels
-            delta3 = np.dot(self.hidden_layer.T, delta)
-            # delta2 = np.dot(training_arr, delta3)
+            delta3 = self.output_layer - bin_tlabels
+            delta2 = np.dot(self.weights2.T, delta3) * (self.hidden_layer * (1 - self.hidden_layer))
 
-            gradients2 = gradients2 + delta3
-            # gradients1 = gradients1 + delta2
+            # print(f"shape of delta3: {delta3.shape}")
+            # print(f"shape of delta2: {delta2.shape}")
+            
+
+            gradients2 = gradients2 + np.dot(delta3, self.hidden_layer.T)
+            gradients1 = gradients1 + np.dot(delta2, training_arr)
             
             # errors = self.compute_errors()
             # print(delta)
-            # self.weights1 = self.weights1 - gradients1
-            self.weights2 = self.weights2 - gradients2
+            avg_grad1 = 1/datasize * gradients1 + regularization * self.weights1
+            avg_grad2 = 1/datasize * gradients2 + regularization * self.weights2
+            self.weights1 = self.weights1 - learning_rate * avg_grad1
+            self.weights2 = self.weights2 - learning_rate * avg_grad2
             
             correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
             i += 1
             if i % 100 == 0:
                 print(f"Correct guesses: {correct} out of {len(training_arr)} after {i} iterations")
-            if time.time() >= countdown or correct == len(training_arr) * 0.95:
+            if time.time() >= countdown or correct == len(training_arr):
                 timer = False
         np.savetxt("neurondelta.txt", delta3, fmt='%.4f', delimiter=' ')
-        # np.savetxt("neuronerrors.txt", delta2, fmt='%.4f', delimiter=' ')
-        np.savetxt("neurongradients.txt", gradients2, fmt='%.4f', delimiter=' ')
+        np.savetxt("neurongradients1.txt", gradients1, fmt='%.4f', delimiter=' ')
+        np.savetxt("neurongradients2.txt", gradients2, fmt='%.4f', delimiter=' ')
         np.savetxt("neuronweights1.txt", self.weights2, fmt='%.4f', delimiter=' ')
         np.savetxt("neuronweights2.txt", self.weights2, fmt='%.4f', delimiter=' ')
         # np.savetxt('neuronguesses.txt', guesses, fmt='%i', delimiter=',')
@@ -80,15 +93,15 @@ class NeuralNetworkClassifier:
         self.output_layer = self.activation_func(self.hidden_layer, self.weights2, self.bias2) # potentially incorrect due to self.weights2's shape and value placement
         # print(f"shape of neuron output: {self.output_layer.shape}")
 
-        guesses = np.argmax(self.output_layer, axis=1)
+        guesses = np.argmax(self.output_layer, axis=0)
         return guesses
     
     def activation_func(self, data, weights, bias):
         """
         Performs Sigmoid function and returns resulting matrix.
         """
-    
-        v = np.dot(data, weights) + bias
+
+        v = np.dot(weights, data.T) + bias if np.all(data != self.hidden_layer) else np.dot(weights, data) + bias
         '''
         if np.all(weights == self.weights1) and data.shape[0] > 100:
             np.savetxt('v1.txt', v, fmt='%f', delimiter=' ')
@@ -108,7 +121,7 @@ class NeuralNetworkClassifier:
         """
         Converts label data passed in to a binary matrix
         """
-        return np.eye(len(self.legalLabels))[data]
+        return np.eye(len(self.legalLabels))[data].T
     
     def counter_to_array(self, datum):
         """
