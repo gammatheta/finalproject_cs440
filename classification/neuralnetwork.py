@@ -73,7 +73,7 @@ class NeuralNetworkClassifier:
             i += 1
             if i % 1000 == 0:
                 print(f"Correct guesses: {correct} out of {len(training_arr)} after {i} iterations")
-            if time.time() >= countdown or correct >= len(training_arr) * 0.95:
+            if time.time() >= countdown or correct >= len(training_arr):
                 timer = False
         np.savetxt("neurondelta.txt", delta3, fmt='%.4f', delimiter=' ')
         np.savetxt("neurongradients1.txt", gradients1, fmt='%.4f', delimiter=' ')
@@ -86,22 +86,23 @@ class NeuralNetworkClassifier:
         if not isinstance(datum, np.ndarray):
             # print("incompatible type with datum")
             datum = self.counter_to_array(datum)
+        layer = 2
         # print(f"shape of data passed in: {datum.shape}")
         # if type(datum)
-        self.hidden_layer = self.activation_func(datum, self.weights1, self.bias1)
- 
-        self.output_layer = self.activation_func(self.hidden_layer, self.weights2, self.bias2) # potentially incorrect due to self.weights2's shape and value placement
+        self.hidden_layer = self.activation_func(datum, self.weights1, self.bias1, layer)
+        layer += 1
+        self.output_layer = self.activation_func(self.hidden_layer, self.weights2, self.bias2, layer) # potentially incorrect due to self.weights2's shape and value placement
         # print(f"shape of neuron output: {self.output_layer.shape}")
 
         guesses = np.argmax(self.output_layer, axis=0)
         return guesses
     
-    def activation_func(self, data, weights, bias):
+    def activation_func(self, data, weights, bias, layer):
         """
         Performs Sigmoid function and returns resulting matrix.
         """
 
-        v = np.dot(weights, data.T) + bias if np.all(data != self.hidden_layer) else np.dot(weights, data) + bias
+        v = np.dot(weights, data.T) + bias if layer == 2 else np.dot(weights, data) + bias
         '''
         if np.all(weights == self.weights1) and data.shape[0] > 100:
             np.savetxt('v1.txt', v, fmt='%f', delimiter=' ')
