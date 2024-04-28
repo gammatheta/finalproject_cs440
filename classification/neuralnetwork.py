@@ -71,9 +71,9 @@ class NeuralNetworkClassifier:
             
             correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
             i += 1
-            if i % 100 == 0:
+            if i % 1000 == 0:
                 print(f"Correct guesses: {correct} out of {len(training_arr)} after {i} iterations")
-            if time.time() >= countdown or correct == len(training_arr):
+            if time.time() >= countdown or correct >= len(training_arr) * 0.95:
                 timer = False
         np.savetxt("neurondelta.txt", delta3, fmt='%.4f', delimiter=' ')
         np.savetxt("neurongradients1.txt", gradients1, fmt='%.4f', delimiter=' ')
