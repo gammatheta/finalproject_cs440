@@ -19,22 +19,22 @@ class NeuralNetworkClassifier:
         self.weights2 = np.array([])
 
     def train(self, trainingData, trainingLabels, validationData, validationLabels):        
-        training_arr = self.counter_to_array(list(trainingData))
+        training_arr = self.counter_to_array(list(trainingData)) # converts training data into a numpy array to perform numpy operations with data
         datasize = training_arr.shape[0]
         pixel_size = training_arr.shape[1]
-        hidden_size = 512
+        hidden_size = 512 # amount of neurons for the hidden layer
         output_size = len(self.legalLabels)
         bin_tlabels = self.to_binary(trainingLabels)
         weights1file = 'neuralfacesweights1.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights1.txt'
         weights2file = 'neuralfacesweights2.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights2.txt'
 
         # initialization of weights
-        self.weights1 = np.loadtxt(weights1file, delimiter=' ')
-        self.weights2 = np.loadtxt(weights2file, delimiter=' ')
-        # self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
-        # self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
+        # self.weights1 = np.loadtxt(weights1file, delimiter=' ')
+        # self.weights2 = np.loadtxt(weights2file, delimiter=' ')
+        self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
+        self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
 
-        countdown = time.time() + (self.max_iterations * 60)
+        # countdown = time.time() + (self.max_iterations * 60)
         end_time = 'inf'
         initial_time = time.time()
         gradients1 = np.zeros((hidden_size, pixel_size))
@@ -42,8 +42,8 @@ class NeuralNetworkClassifier:
         timer = True
         streak = 0
         correct = 0
-        i = 0
-        while timer:
+        iterations = 0
+        while iterations < self.max_iterations:
             guesses = self.classify(training_arr)
 
             delta3 = self.output_layer - bin_tlabels
@@ -57,17 +57,21 @@ class NeuralNetworkClassifier:
             self.weights1 = self.weights1 - learning_rate * avg_grad1
             self.weights2 = self.weights2 - learning_rate * avg_grad2
             
-            correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
-            i += 1
+            # correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
+            iterations += 1
+            '''
             if i % 1000 == 0: print(f"Correct guesses: {correct} out of {len(training_arr)} after {i} iterations")
             if (correct >= len(training_arr) * 0.99): streak += 1
             if time.time() >= countdown or streak >= 100: 
-                end_time = time.time()
+                
                 timer = False
-
-        print(f"Training finished after {i} iterations with {correct} correct out of {len(training_arr)}")
+            '''
+        end_time = time.time()
         time_diff = int(end_time - initial_time)
-        print(f"Time elapsed: {time_diff // 60} mins and {time_diff % 60}")
+        correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
+        
+        print(f"Training finished after {iterations} iterations with {correct} correct out of {len(training_arr)}")
+        print(f"Time elapsed: {time_diff // 60} mins and {time_diff % 60} seconds")
         np.savetxt(weights1file, self.weights1, fmt='%f', delimiter=' ')
         np.savetxt(weights2file, self.weights2, fmt='%f', delimiter=' ')
 

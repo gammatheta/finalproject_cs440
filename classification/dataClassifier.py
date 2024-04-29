@@ -114,16 +114,27 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   
   # Put any code here...
   # Example of use:
-  for i in range(len(guesses)):
-      prediction = guesses[i]
-      truth = testLabels[i]
-      if (prediction != truth):
-          print("===================================")
-          print(f"Mistake on example {i}")
-          print(f"Predicted {prediction}; truth is {truth}")
-          print("Image: ")
-          print(rawTestData[i])
-          break
+  correct = np.array([guesses[i] == testLabels[i] for i in range(len(testLabels))])
+  prediction_mean = np.mean(correct)
+  accuracy = np.std(correct)
+  
+  print(f"Mean was: {prediction_mean}")
+  print(f"Accuracy standard deviation was: {accuracy}")
+  testing = True
+  while testing:
+    usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to exit: "))
+
+    if usr_input == -1:
+      print("Testing was ended")
+      break
+
+    print(rawTestData[usr_input])
+    if guesses[usr_input] == testLabels[usr_input]:
+      print(f"Program prediction {guesses[usr_input]} was correct, number was {testLabels[usr_input]}.")
+    else:
+      print(f"Program prediction {guesses[usr_input]} was incorrect, number was {testLabels[usr_input]}")
+
+    print("========================================================")
 
 
 ## =====================
@@ -162,7 +173,7 @@ class ImagePrinter:
 def default(str):
   return str + ' [Default: %default]'
 
-def readCommand( argv ):
+def readCommand(argv):
   "Processes the command used to run from the command line."
   from optparse import OptionParser  
   parser = OptionParser(USAGE_STRING)
@@ -177,7 +188,7 @@ def readCommand( argv ):
   parser.add_option('-w', '--weights', help=default('Whether to print weights'), default=False, action="store_true")
   parser.add_option('-k', '--smoothing', help=default("Smoothing parameter (ignored when using --autotune)"), type="float", default=2.0)
   parser.add_option('-a', '--autotune', help=default("Whether to automatically tune hyperparameters"), default=False, action="store_true")
-  parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=3, type="int")
+  parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=5, type="int")
   parser.add_option('-s', '--test', help=default("Amount of test data to use"), default=TEST_SET_SIZE, type="int")
 
   options, otherjunk = parser.parse_args(argv)

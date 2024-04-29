@@ -83,7 +83,6 @@ class PerceptronClassifier:
     training_rate = 1
     iteration = 0
     corrections = 0
-    max_iterations = 1
     # print(f"feature size: {len(self.features)}")
     # print(self.features[0])
     while True:
@@ -116,8 +115,8 @@ class PerceptronClassifier:
       iteration += 1
       if isTimeUp:
         break
-
-    print("trained!")
+    end_time = time.time()
+    print("")
     '''
     with open(filename, 'w') as f:
       for label, weights in self.weights.items():
