@@ -115,15 +115,10 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   # Put any code here...
   # Example of use:
   correct = np.array([guesses[i] == testLabels[i] for i in range(len(testLabels))])
-  prediction_mean = np.mean(correct)
-  accuracy = np.std(correct)
-  
-  print(f"Mean was: {prediction_mean}")
-  print(f"Accuracy standard deviation was: {accuracy}")
   testing = True
   while testing:
-    usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to exit: "))
-
+    # usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to exit: "))
+    usr_input = -1
     if usr_input == -1:
       print("Testing was ended")
       break

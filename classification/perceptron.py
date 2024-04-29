@@ -49,48 +49,41 @@ class PerceptronClassifier:
 
     self.features = list(trainingData) # could be useful later
     # print(f"size of list in feature: {len(self.features[0])}")
-    '''
+    
     allkeys = self.features[0].keys()
     for key in allkeys:
        for label in self.legalLabels:
          weight = random.random()
          self.weights[label][key] = weight
-    '''
-    filename = 'faceweights.txt' if len(self.legalLabels) == 2 else 'digitweights.txt'
-    self.weights = util.Counter.parse_weights(filename)
-    '''
+    
+    # filename = 'faceweights.txt' if len(self.legalLabels) == 2 else 'digitweights.txt'
+    # self.weights = util.Counter.parse_weights(filename)
+  
     for label in self.legalLabels:
       for key in allkeys:
         weight = random.random()
         self.weights[label][key] = weight
       self.weights[label]['bias'] = 1
-    '''
 
-    with open('initial_weights.txt', 'w') as f:
-      for label, weight in self.weights.items():
-        f.write(f"{label}:\n{weight}\n")
-        f.close 
-
-    # trainingData_list = self.features[99]
-    # print(type(self.features))
-    # DO NOT ZERO OUT YOUR WEIGHTS BEFORE STARTING TRAINING, OR
-    # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
-
-    streak = 0    
-    print(f'Running for {self.max_iterations} minutes')
-    t_end = time.time() + (60 * self.max_iterations)
+    # streak = 0    
+    # print(f'Running for {self.max_iterations} minutes')
+    # t_end = time.time() + (60 * self.max_iterations)
+    start_time = time.time()
     isTimeUp = False
     training_rate = 1
-    iteration = 0
+    iterations = 0
     corrections = 0
     # print(f"feature size: {len(self.features)}")
     # print(self.features[0])
-    while True:
+    while iterations < self.max_iterations:
       # print(f'beginning iteration {iteration}...')
       guesses = self.classify(self.features)
+      
+      '''
       if time.time() >= t_end:
           isTimeUp = True
           break
+      '''
       for i in range(len(self.features)):
         # print(f"Beginning feature {i}")
         # "*** YOUR CODE HERE ***"
@@ -109,14 +102,17 @@ class PerceptronClassifier:
           corrections += 1
         # print(f"finished feature {i}")
       # print()
-      # print(f"Corrections made during iteration {iteration}: {corrections}")
+      # print(f"Corrections made during iteration {iterations}: {corrections}")
       corrections = 0
       training_rate *= 0.95
-      iteration += 1
+      iterations += 1
       if isTimeUp:
         break
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
     end_time = time.time()
-    print("")
+    time_diff = int(end_time - start_time)
+    print(f"Training finished after {iterations} iterations with {correct} correct out of {len(self.features)}")
+    print(f"Time elapsed: {time_diff // 60} mins and {time_diff % 60} seconds")
     '''
     with open(filename, 'w') as f:
       for label, weights in self.weights.items():
@@ -125,17 +121,7 @@ class PerceptronClassifier:
           f.write(f"{key};{weight};")
         f.write("\n")
     f.close
-    with open("initial_weights.txt") as i, open(filename) as w: 
-      initial = i.readlines()
-      after = w.readlines()
-      if initial == after:
-        print("no update in weights after iterations")
-      else:
-        print("weights were updated")
-    i.close()
-    w.close()
     '''
-    
     
 
     # for iteration in range(self.max_iterations):
