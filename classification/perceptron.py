@@ -52,11 +52,9 @@ class PerceptronClassifier:
     
     using_prime = True if filename == 'prime' else False
     if using_prime:
-      print("using prime")
       filename = 'primefaceweights.txt' if len(self.legalLabels) == 2 else 'primedigitweights.txt'
       self.weights = util.Counter.parse_weights(filename)
     else:
-      print("not using prime")
       for label in self.legalLabels:
         for key in allkeys:
           weight = random.random()
