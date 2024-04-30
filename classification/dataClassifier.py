@@ -9,6 +9,10 @@
 # This file contains feature extraction methods and harness 
 # code for data classification
 
+# import mostFrequent
+# import naiveBayes
+import collections
+import numpy as np
 import perceptron
 import neuralnetwork
 import samples
@@ -110,16 +114,22 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   
   # Put any code here...
   # Example of use:
-  for i in range(len(guesses)):
-      prediction = guesses[i]
-      truth = testLabels[i]
-      if (prediction != truth):
-          print("===================================")
-          print(f"Mistake on example {i}")
-          print(f"Predicted {prediction}; truth is {truth}")
-          print("Image: ")
-          print(rawTestData[i])
-          break
+  correct = np.array([guesses[i] == testLabels[i] for i in range(len(testLabels))])
+  testing = True
+  while testing:
+    usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to end this instance of testing: "))
+    usr_input = -1
+    if usr_input == -1:
+      print("Testing instance was ended")
+      break
+
+    print(rawTestData[usr_input])
+    if guesses[usr_input] == testLabels[usr_input]:
+      print(f"Program prediction {guesses[usr_input]} was correct, number was {testLabels[usr_input]}.")
+    else:
+      print(f"Program prediction {guesses[usr_input]} was incorrect, number was {testLabels[usr_input]}")
+
+    print("========================================================")
 
 
 ## =====================
@@ -158,7 +168,7 @@ class ImagePrinter:
 def default(str):
   return str + ' [Default: %default]'
 
-def readCommand( argv ):
+def readCommand(argv):
   "Processes the command used to run from the command line."
   from optparse import OptionParser  
   parser = OptionParser(USAGE_STRING)
@@ -173,7 +183,7 @@ def readCommand( argv ):
   parser.add_option('-w', '--weights', help=default('Whether to print weights'), default=False, action="store_true")
   parser.add_option('-k', '--smoothing', help=default("Smoothing parameter (ignored when using --autotune)"), type="float", default=2.0)
   parser.add_option('-a', '--autotune', help=default("Whether to automatically tune hyperparameters"), default=False, action="store_true")
-  parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=3, type="int")
+  parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=5, type="int")
   parser.add_option('-s', '--test', help=default("Amount of test data to use"), default=TEST_SET_SIZE, type="int")
 
   options, otherjunk = parser.parse_args(argv)
@@ -245,6 +255,11 @@ def readCommand( argv ):
   # print("iterations: " + str(options.iterations))
   elif(options.classifier == "neural"):
     classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels, options.iterations)
+
+    print("iterations: " + str(options.iterations) + "mins")
+  elif(options.classifier == "neural"):
+    classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels,options.iterations)
+    print("iterations: " + str(options.iterations) + "mins")
   # elif(options.classifier == "mira"):
   #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
   #   if (options.autotune):
@@ -320,14 +335,17 @@ def runClassifier(args, options):
   classifier.train(trainingData, trainingLabels, validationData, validationLabels)
   print("Validating...")
   guesses = classifier.classify(validationData)
-  correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+  if isinstance(guesses, np.ndarray): correct = [np.all(guesses[i] == validationLabels[i]) for i in range(len(validationLabels))].count(True)
+  else: correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
   print(f"{str(correct)} correct out of {str(len(validationLabels))} ({100.0 * correct / len(validationLabels):.1f}).")
   print("Testing...")
   guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
+  if isinstance(guesses, np.ndarray): correct = [np.all(guesses[i] == testLabels[i]) for i in range(len(testLabels))].count(True)
+  else: correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
   print(f"{str(correct)} correct out of {str(len(testLabels))} ({100.0 * correct / len(testLabels):.1f}).")
   analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   
+  '''
   # do odds ratio computation if specified at command line
   if((options.odds) & (options.classifier == "naiveBayes" or (options.classifier == "nb")) ):
     label1, label2 = options.label1, options.label2
@@ -339,8 +357,14 @@ def runClassifier(args, options):
       
     print(string3)
     printImage(features_odds)
+'''
 
   if((options.weights) & (options.classifier == "perceptron")):
+    for l in classifier.legalLabels:
+      features_weights = classifier.findHighWeightFeatures(l)
+      print ("=== Features with high weight for label %d ==="%l)
+      printImage(features_weights)
+  elif((options.weights) & (options.classifier == "neural")):
     for l in classifier.legalLabels:
       features_weights = classifier.findHighWeightFeatures(l)
       print ("=== Features with high weight for label %d ==="%l)
@@ -354,6 +378,21 @@ def runClassifier(args, options):
 
 if __name__ == '__main__':
   # Read input
-  args, options = readCommand(sys.argv[1:])
+  sys.argv = ['dataClassifier.py', '-c', 'perceptron', '-d', 'digits', '-i', '15', '-t', '500']
+  testing = True
+  while testing:
+    classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
+    imagetype = input("faces or digits?\n").lower()
+    iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
+    dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
+
+    sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset]
+    print(f"argv: {sys.argv}")
+    args, options = readCommand(sys.argv[1:])
+    runClassifier(args, options)
+
+    check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
+    testing = True if check == 'yes' else False
+  
   # Run classifier
-  runClassifier(args, options)
+  
