@@ -65,7 +65,7 @@ class PerceptronClassifier:
 
     # streak = 0    
     # print(f'Running for {self.max_iterations} minutes')
-    t_end = time.time() + (60 * self.max_iterations)
+    # t_end = time.time() + (60 * self.max_iterations)
     start_time = time.time()
     isTimeUp = False
     training_rate = 1
@@ -73,7 +73,7 @@ class PerceptronClassifier:
     corrections = 0
     # print(f"feature size: {len(self.features)}")
     # print(self.features[0])
-    while time.time() < t_end:
+    while iterations < self.max_iterations:
       # print(f'beginning iteration {iteration}...')
       guesses = self.classify(self.features)
       
