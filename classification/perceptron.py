@@ -51,10 +51,6 @@ class PerceptronClassifier:
     # print(f"size of list in feature: {len(self.features[0])}")
     
     allkeys = self.features[0].keys()
-    for key in allkeys:
-       for label in self.legalLabels:
-         weight = random.random()
-         self.weights[label][key] = weight
     
     # filename = 'faceweights.txt' if len(self.legalLabels) == 2 else 'digitweights.txt'
     # self.weights = util.Counter.parse_weights(filename)
@@ -108,11 +104,11 @@ class PerceptronClassifier:
       iterations += 1
       if isTimeUp:
         break
-    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    correct = [guesses[i] == trainingLabels[i] for i in range(len(trainingLabels))].count(True)
     end_time = time.time()
     time_diff = int(end_time - start_time)
     print(f"Training finished after {iterations} iterations with {correct} correct out of {len(self.features)}")
-    print(f"Time elapsed: {time_diff // 60} mins and {time_diff % 60} seconds")
+    print(f"Time elapsed: {time_diff} seconds")
     '''
     with open(filename, 'w') as f:
       for label, weights in self.weights.items():

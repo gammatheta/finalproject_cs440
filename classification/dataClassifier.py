@@ -117,10 +117,10 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   correct = np.array([guesses[i] == testLabels[i] for i in range(len(testLabels))])
   testing = True
   while testing:
-    # usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to exit: "))
+    usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to end this instance of testing: "))
     usr_input = -1
     if usr_input == -1:
-      print("Testing was ended")
+      print("Testing instance was ended")
       break
 
     print(rawTestData[usr_input])
@@ -378,6 +378,21 @@ def runClassifier(args, options):
 
 if __name__ == '__main__':
   # Read input
-  args, options = readCommand(sys.argv[1:])
+  sys.argv = ['dataClassifier.py', '-c', 'perceptron', '-d', 'digits', '-i', '15', '-t', '500']
+  testing = True
+  while testing:
+    classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
+    imagetype = input("faces or digits?\n").lower()
+    iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
+    dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
+
+    sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset]
+    print(f"argv: {sys.argv}")
+    args, options = readCommand(sys.argv[1:])
+    runClassifier(args, options)
+
+    check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
+    testing = True if check == 'yes' else False
+  
   # Run classifier
-  runClassifier(args, options)
+  

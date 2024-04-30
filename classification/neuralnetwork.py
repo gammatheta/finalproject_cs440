@@ -70,8 +70,8 @@ class NeuralNetworkClassifier:
         time_diff = int(end_time - initial_time)
         correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
 
-        print(f"Training finished after {iterations} iterations with {correct} correct out of {len(training_arr)}")
-        print(f"Time elapsed: {time_diff // 60} mins and {time_diff % 60} seconds")
+        print(f"Training finished after {iterations} iterations with {correct} correct out of {len(training_arr)} correct predictions.")
+        print(f"Time elapsed: {time_diff} seconds")
         # np.savetxt(weights1file, self.weights1, fmt='%f', delimiter=' ')
         # np.savetxt(weights2file, self.weights2, fmt='%f', delimiter=' ')
 
