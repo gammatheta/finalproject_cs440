@@ -58,39 +58,6 @@ def basicFeatureExtractorFace(datum):
         features[(x,y)] = 0
   return features
 
-def enhancedFeatureExtractorDigit(datum):
-  """
-  Your feature extraction playground.
-  
-  You should return a util.Counter() of features
-  for this datum (datum is of type samples.Datum).
-  
-  ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-  
-  ##
-  """
-  features =  basicFeatureExtractorDigit(datum)
-
-  "*** YOUR CODE HERE ***"
-  
-  return features
-
-
-def contestFeatureExtractorDigit(datum):
-  """
-  Specify features to use for the minicontest
-  """
-  features =  basicFeatureExtractorDigit(datum)
-  return features
-
-def enhancedFeatureExtractorFace(datum):
-  """
-  Your feature extraction playground for faces.
-  It is your choice to modify this.
-  """
-  features =  basicFeatureExtractorFace(datum)
-  return features
-
 def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage):
   """
   This function is called after learning.
@@ -176,15 +143,10 @@ def readCommand(argv):
   parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['perceptron', 'neural'], default='perceptron')
   parser.add_option('-d', '--data', help=default('Dataset to use'), choices=['digits', 'faces'], default='digits')
   parser.add_option('-t', '--training', help=default('The size of the training set'), default=100, type="int")
-  parser.add_option('-f', '--features', help=default('Whether to use enhanced features'), default=False, action="store_true")
-  parser.add_option('-o', '--odds', help=default('Whether to compute odds ratios'), default=False, action="store_true")
-  parser.add_option('-1', '--label1', help=default("First label in an odds ratio comparison"), default=0, type="int")
-  parser.add_option('-2', '--label2', help=default("Second label in an odds ratio comparison"), default=1, type="int")
   parser.add_option('-w', '--weights', help=default('Whether to print weights'), default=False, action="store_true")
-  parser.add_option('-k', '--smoothing', help=default("Smoothing parameter (ignored when using --autotune)"), type="float", default=2.0)
-  parser.add_option('-a', '--autotune', help=default("Whether to automatically tune hyperparameters"), default=False, action="store_true")
   parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=5, type="int")
   parser.add_option('-s', '--test', help=default("Amount of test data to use"), default=TEST_SET_SIZE, type="int")
+  parser.add_option('-p', '--prime', help=default("Whether to use prime weight files"), default='')
 
   options, otherjunk = parser.parse_args(argv)
   if len(otherjunk) != 0: raise Exception('Command line input not understood: ' + str(otherjunk))
@@ -195,29 +157,15 @@ def readCommand(argv):
   print("--------------------")
   print("data:\t\t" + options.data)
   print("classifier:\t\t" + options.classifier)
-  if not options.classifier == 'minicontest':
-    print("using enhanced features?:\t" + str(options.features))
-  else:
-    print("using minicontest feature extractor")
+
   print("training set size:\t" + str(options.training))
   if(options.data=="digits"):
     printImage = ImagePrinter(DIGIT_DATUM_WIDTH, DIGIT_DATUM_HEIGHT).printImage
-    if (options.features):
-      featureFunction = enhancedFeatureExtractorDigit
-    else:
-      featureFunction = basicFeatureExtractorDigit
-    if (options.classifier == 'minicontest'):
-      featureFunction = contestFeatureExtractorDigit
   elif(options.data=="faces"):
     printImage = ImagePrinter(FACE_DATUM_WIDTH, FACE_DATUM_HEIGHT).printImage
-    if (options.features):
-      featureFunction = enhancedFeatureExtractorFace
-    else:
-      featureFunction = basicFeatureExtractorFace      
-  else:
-    print("Unknown dataset", options.data)
-    print(USAGE_STRING)
-    sys.exit(2)
+
+    
+  featureFunction = basicFeatureExtractorFace
     
   if(options.data=="digits"):
     legalLabels = range(10)
@@ -229,16 +177,6 @@ def readCommand(argv):
     print(USAGE_STRING)
     sys.exit(2)
     
-  if options.smoothing <= 0:
-    print(f"Please provide a positive number for smoothing (you provided: {options.smoothing})")
-    print(USAGE_STRING)
-    sys.exit(2)
-    
-  if options.odds:
-    if options.label1 not in legalLabels or options.label2 not in legalLabels:
-      print(f"Didn't provide a legal labels for the odds ratio: ({options.label1},{options.label2})")
-      print(USAGE_STRING)
-      sys.exit(2)
 
   # if(options.classifier == "mostFrequent"):
     # classifier = mostFrequent.MostFrequentClassifier(legalLabels)
@@ -383,12 +321,15 @@ if __name__ == '__main__':
   while testing:
     classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
     imagetype = input("faces or digits?\n").lower()
-    iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
     dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
-
-    sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset]
+    iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
+    prime = input("Would you like to use the prime weights? Yes or No (Best case test weights that were generated from a prior run and stored for use in future runs of this program)\n").lower()
+    filename = 'prime' if prime == 'yes' else ''
+    
+    sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset, '-p', 'prime']
     print(f"argv: {sys.argv}")
     args, options = readCommand(sys.argv[1:])
+    print(f'options: {options}')
     runClassifier(args, options)
 
     check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
