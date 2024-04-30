@@ -29,14 +29,14 @@ class NeuralNetworkClassifier:
         using_prime = True if len(filename) > 0 else False
 
         # initialization of weights
+        weights1file = 'primeneuralfacesweights1.txt' if training_arr.shape[1] > 784 else 'primeneuraldigitsweights1.txt'
+        weights2file = 'primeneuralfacesweights2.txt' if training_arr.shape[1] > 784 else 'primeneuraldigitsweights2.txt'
         if using_prime:
             print("using prime")
-            weights1file = 'primeneuralfacesweights1.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights1.txt'
-            weights2file = 'primeneuralfacesweights2.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights2.txt'
             self.weights1 = np.loadtxt(weights1file, delimiter=' ')
             self.weights2 = np.loadtxt(weights2file, delimiter=' ')
         else:
-            print("using prime")
+            print("not using prime")
             self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
             self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
 
