@@ -304,7 +304,7 @@ if __name__ == '__main__':
       classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
       imagetype = input("faces or digits?\n").lower()
       dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
-      iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
+      iterations = input("How many epochs would you like to run? (number of loops that will be done in training)\n").lower()
       prime = input("Would you like to use the prime weights? Yes or No (Best case test weights that were generated from a prior run and stored for use in future runs of this program)\n").lower()
       filename = 'prime' if prime == 'yes' else ''
       
