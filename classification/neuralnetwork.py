@@ -10,7 +10,10 @@ class NeuralNetworkClassifier:
     def __init__(self, legalLabels, max_iterations):
         self.legalLabels = legalLabels
         self.type = "neuralnetwork"
-        self.max_iterations = max_iterations
+        if max_iterations == 0:
+            self.max_iterations = 1
+        else:
+            self.max_iterations = max_iterations
         self.bias1 = 0.1
         self.bias2 = 0.2
         self.hidden_layer = []
@@ -74,9 +77,9 @@ class NeuralNetworkClassifier:
             '''
         end_time = time.time()
         time_diff = int(end_time - initial_time)
-        correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
+        # correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
 
-        print(f"Training finished after {iterations} iterations with {correct} correct out of {len(training_arr)} correct predictions.")
+        # print(f"Training finished after {iterations} iterations with {correct} correct out of {len(training_arr)} correct predictions.")
         print(f"Time elapsed: {time_diff} seconds")
         # np.savetxt(weights1file, self.weights1, fmt='%f', delimiter=' ')
         # np.savetxt(weights2file, self.weights2, fmt='%f', delimiter=' ')

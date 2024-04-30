@@ -106,10 +106,10 @@ class PerceptronClassifier:
       iterations += 1
       if isTimeUp:
         break
-    correct = [guesses[i] == trainingLabels[i] for i in range(len(trainingLabels))].count(True)
+    # correct = [guesses[i] == trainingLabels[i] for i in range(len(trainingLabels))].count(True)
     end_time = time.time()
     time_diff = int(end_time - start_time)
-    print(f"Training finished after {iterations} iterations with {correct} correct out of {len(self.features)}")
+    # print(f"Training finished after {iterations} iterations with {correct} correct out of {len(self.features)}")
     print(f"Time elapsed: {time_diff} seconds")
 
     '''
