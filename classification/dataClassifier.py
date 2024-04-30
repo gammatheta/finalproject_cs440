@@ -85,9 +85,9 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   testing = True
   while testing:
     usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to end this instance of testing: "))
-    usr_input = -1
     if usr_input == -1:
       print("Testing instance was ended")
+      print("--------------------------------------------------------")
       break
 
     print(rawTestData[usr_input])
@@ -97,7 +97,7 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
       print(f"Program prediction {guesses[usr_input]} was incorrect, number was {testLabels[usr_input]}")
 
     print("========================================================")
-
+           
 
 ## =====================
 ## You don't have to modify any code below.
@@ -146,7 +146,7 @@ def readCommand(argv):
   parser.add_option('-w', '--weights', help=default('Whether to print weights'), default=False, action="store_true")
   parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=5, type="int")
   parser.add_option('-s', '--test', help=default("Amount of test data to use"), default=TEST_SET_SIZE, type="int")
-  parser.add_option('-p', '--prime', help=default("Whether to use prime weight files"), default='')
+  parser.add_option('-p', '--prime', help=default("Whether to use prime weight files"), choices=['', 'prime'], default='')
 
   options, otherjunk = parser.parse_args(argv)
   if len(otherjunk) != 0: raise Exception('Command line input not understood: ' + str(otherjunk))
@@ -157,26 +157,29 @@ def readCommand(argv):
   print("--------------------")
   print("data:\t\t" + options.data)
   print("classifier:\t\t" + options.classifier)
-
+  
   print("training set size:\t" + str(options.training))
   if(options.data=="digits"):
     printImage = ImagePrinter(DIGIT_DATUM_WIDTH, DIGIT_DATUM_HEIGHT).printImage
+    featureFunction = basicFeatureExtractorDigit
   elif(options.data=="faces"):
     printImage = ImagePrinter(FACE_DATUM_WIDTH, FACE_DATUM_HEIGHT).printImage
-
-    
-  featureFunction = basicFeatureExtractorFace
+    featureFunction = basicFeatureExtractorFace
+  else:
+    print("Unknown dataset", options.data)
+    print(USAGE_STRING)
+    sys.exit(2)
     
   if(options.data=="digits"):
     legalLabels = range(10)
   else:
     legalLabels = range(2)
+
+
     
   if options.training <= 0:
     print(f"Training set size should be a positive integer (you provided: {options.training})")
     print(USAGE_STRING)
-    sys.exit(2)
-    
 
   # if(options.classifier == "mostFrequent"):
     # classifier = mostFrequent.MostFrequentClassifier(legalLabels)
@@ -316,7 +319,6 @@ def runClassifier(args, options):
 
 if __name__ == '__main__':
   # Read input
-  sys.argv = ['dataClassifier.py', '-c', 'perceptron', '-d', 'digits', '-i', '15', '-t', '500']
   testing = True
   while testing:
     classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
@@ -334,6 +336,5 @@ if __name__ == '__main__':
 
     check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
     testing = True if check == 'yes' else False
-  
-  # Run classifier
-  
+
+  print("Program terminated.")  
