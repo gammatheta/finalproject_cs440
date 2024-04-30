@@ -174,23 +174,11 @@ def readCommand(argv):
     legalLabels = range(10)
   else:
     legalLabels = range(2)
-
-
     
   if options.training <= 0:
     print(f"Training set size should be a positive integer (you provided: {options.training})")
     print(USAGE_STRING)
 
-  # if(options.classifier == "mostFrequent"):
-    # classifier = mostFrequent.MostFrequentClassifier(legalLabels)
-  # elif(options.classifier == "naiveBayes" or options.classifier == "nb"):
-  #   classifier = naiveBayes.NaiveBayesClassifier(legalLabels)
-  #   classifier.setSmoothing(options.smoothing)
-  #   if (options.autotune):
-  #       print("using automatic tuning for naivebayes")
-  #       classifier.automaticTuning = True
-  #   else:
-  #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   if(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
   # print("iterations: " + str(options.iterations))
@@ -201,16 +189,6 @@ def readCommand(argv):
   elif(options.classifier == "neural"):
     classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels,options.iterations)
     print("iterations: " + str(options.iterations) + "mins")
-  # elif(options.classifier == "mira"):
-  #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
-  #   if (options.autotune):
-  #       print("using automatic tuning for MIRA")
-  #       classifier.automaticTuning = True
-  #   else:
-  #       print("using default C=0.001 for MIRA")
-  # elif(options.classifier == 'minicontest'):
-  #   import minicontest
-  #   classifier = minicontest.contestClassifier(legalLabels)
   else:
     print("Unknown classifier:", options.classifier)
     print(USAGE_STRING)
@@ -220,7 +198,7 @@ def readCommand(argv):
   args['classifier'] = classifier
   args['featureFunction'] = featureFunction
   args['printImage'] = printImage
-  
+  print(f"options: {options}")
   return args, options
 
 USAGE_STRING = """
@@ -263,7 +241,8 @@ def runClassifier(args, options):
     validationLabels = samples.loadLabelsFile("digitdata/validationlabels", numTest)
     rawTestData = samples.loadDataFile("digitdata/testimages", numTest,DIGIT_DATUM_WIDTH,DIGIT_DATUM_HEIGHT)
     testLabels = samples.loadLabelsFile("digitdata/testlabels", numTest)
-    
+  
+  filename = 'prime' if options.prime == 'prime' else ''
   
   # Extract features
   print("Extracting features...")
@@ -273,7 +252,7 @@ def runClassifier(args, options):
   
   # Conduct training and testing
   print("Training...")
-  classifier.train(trainingData, trainingLabels, validationData, validationLabels)
+  classifier.train(trainingData, trainingLabels, validationData, validationLabels, filename)
   print("Validating...")
   guesses = classifier.classify(validationData)
   if isinstance(guesses, np.ndarray): correct = [np.all(guesses[i] == validationLabels[i]) for i in range(len(validationLabels))].count(True)
@@ -319,22 +298,26 @@ def runClassifier(args, options):
 
 if __name__ == '__main__':
   # Read input
-  testing = True
-  while testing:
-    classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
-    imagetype = input("faces or digits?\n").lower()
-    dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
-    iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
-    prime = input("Would you like to use the prime weights? Yes or No (Best case test weights that were generated from a prior run and stored for use in future runs of this program)\n").lower()
-    filename = 'prime' if prime == 'yes' else ''
-    
-    sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset, '-p', 'prime']
-    print(f"argv: {sys.argv}")
+  if len(sys.argv) <= 1:
+    testing = True
+    while testing:
+      classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
+      imagetype = input("faces or digits?\n").lower()
+      dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
+      iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
+      prime = input("Would you like to use the prime weights? Yes or No (Best case test weights that were generated from a prior run and stored for use in future runs of this program)\n").lower()
+      filename = 'prime' if prime == 'yes' else ''
+      
+      sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset, '-p', filename]
+      print(f"argv: {sys.argv}")
+      args, options = readCommand(sys.argv[1:])
+      print(f'options: {options}')
+      runClassifier(args, options)
+
+      check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
+      testing = True if check == 'yes' else False
+  else:
     args, options = readCommand(sys.argv[1:])
-    print(f'options: {options}')
     runClassifier(args, options)
 
-    check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
-    testing = True if check == 'yes' else False
-
-  print("Program terminated.")  
+  print("Program terminated.\n")  

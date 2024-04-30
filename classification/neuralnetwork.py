@@ -18,21 +18,27 @@ class NeuralNetworkClassifier:
         self.weights1 = np.array([])
         self.weights2 = np.array([])
 
-    def train(self, trainingData, trainingLabels, validationData, validationLabels):        
+    def train(self, trainingData, trainingLabels, validationData, validationLabels, filename):        
         training_arr = self.counter_to_array(list(trainingData)) # converts training data into a numpy array to perform numpy operations with data
         datasize = training_arr.shape[0]
         pixel_size = training_arr.shape[1]
         hidden_size = 512 # amount of neurons for the hidden layer
         output_size = len(self.legalLabels)
         bin_tlabels = self.to_binary(trainingLabels)
-        weights1file = 'neuralfacesweights1.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights1.txt'
-        weights2file = 'neuralfacesweights2.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights2.txt'
+
+        using_prime = True if len(filename) > 0 else False
 
         # initialization of weights
-        # self.weights1 = np.loadtxt(weights1file, delimiter=' ')
-        # self.weights2 = np.loadtxt(weights2file, delimiter=' ')
-        self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
-        self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
+        if using_prime:
+            print("using prime")
+            weights1file = 'primeneuralfacesweights1.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights1.txt'
+            weights2file = 'primeneuralfacesweights2.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights2.txt'
+            self.weights1 = np.loadtxt(weights1file, delimiter=' ')
+            self.weights2 = np.loadtxt(weights2file, delimiter=' ')
+        else:
+            print("using prime")
+            self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
+            self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
 
         # countdown = time.time() + (self.max_iterations * 60)
         end_time = 'inf'

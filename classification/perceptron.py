@@ -33,7 +33,7 @@ class PerceptronClassifier:
     assert len(weights) == len(self.legalLabels)
     self.weights = weights
       
-  def train( self, trainingData, trainingLabels, validationData, validationLabels ):
+  def train( self, trainingData, trainingLabels, validationData, validationLabels, filename):
     """
     The training loop for the perceptron passes through the training data several
     times and updates the weight vector for each label based on classification errors.
@@ -45,25 +45,27 @@ class PerceptronClassifier:
     (and thus represents a vector a values).
     """
     
-    
-
     self.features = list(trainingData) # could be useful later
     # print(f"size of list in feature: {len(self.features[0])}")
     
     allkeys = self.features[0].keys()
     
-    # filename = 'faceweights.txt' if len(self.legalLabels) == 2 else 'digitweights.txt'
-    # self.weights = util.Counter.parse_weights(filename)
-  
-    for label in self.legalLabels:
-      for key in allkeys:
-        weight = random.random()
-        self.weights[label][key] = weight
-      self.weights[label]['bias'] = 1
+    using_prime = True if filename == 'prime' else False
+    if using_prime:
+      print("using prime")
+      filename = 'primefaceweights.txt' if len(self.legalLabels) == 2 else 'primedigitweights.txt'
+      self.weights = util.Counter.parse_weights(filename)
+    else:
+      print("not using prime")
+      for label in self.legalLabels:
+        for key in allkeys:
+          weight = random.random()
+          self.weights[label][key] = weight
+        self.weights[label]['bias'] = 1
 
     # streak = 0    
     # print(f'Running for {self.max_iterations} minutes')
-    # t_end = time.time() + (60 * self.max_iterations)
+    t_end = time.time() + (60 * self.max_iterations)
     start_time = time.time()
     isTimeUp = False
     training_rate = 1
@@ -71,7 +73,7 @@ class PerceptronClassifier:
     corrections = 0
     # print(f"feature size: {len(self.features)}")
     # print(self.features[0])
-    while iterations < self.max_iterations:
+    while time.time() < t_end:
       # print(f'beginning iteration {iteration}...')
       guesses = self.classify(self.features)
       
@@ -109,6 +111,7 @@ class PerceptronClassifier:
     time_diff = int(end_time - start_time)
     print(f"Training finished after {iterations} iterations with {correct} correct out of {len(self.features)}")
     print(f"Time elapsed: {time_diff} seconds")
+
     '''
     with open(filename, 'w') as f:
       for label, weights in self.weights.items():
