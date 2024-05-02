@@ -58,39 +58,6 @@ def basicFeatureExtractorFace(datum):
         features[(x,y)] = 0
   return features
 
-def enhancedFeatureExtractorDigit(datum):
-  """
-  Your feature extraction playground.
-  
-  You should return a util.Counter() of features
-  for this datum (datum is of type samples.Datum).
-  
-  ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-  
-  ##
-  """
-  features =  basicFeatureExtractorDigit(datum)
-
-  "*** YOUR CODE HERE ***"
-  
-  return features
-
-
-def contestFeatureExtractorDigit(datum):
-  """
-  Specify features to use for the minicontest
-  """
-  features =  basicFeatureExtractorDigit(datum)
-  return features
-
-def enhancedFeatureExtractorFace(datum):
-  """
-  Your feature extraction playground for faces.
-  It is your choice to modify this.
-  """
-  features =  basicFeatureExtractorFace(datum)
-  return features
-
 def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage):
   """
   This function is called after learning.
@@ -118,9 +85,9 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   testing = True
   while testing:
     usr_input = int(input("Test specific image? (pick a number between 0 to 99) or -1 to end this instance of testing: "))
-    usr_input = -1
     if usr_input == -1:
       print("Testing instance was ended")
+      print("--------------------------------------------------------")
       break
 
     print(rawTestData[usr_input])
@@ -130,7 +97,7 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
       print(f"Program prediction {guesses[usr_input]} was incorrect, number was {testLabels[usr_input]}")
 
     print("========================================================")
-
+           
 
 ## =====================
 ## You don't have to modify any code below.
@@ -176,15 +143,10 @@ def readCommand(argv):
   parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['perceptron', 'neural'], default='perceptron')
   parser.add_option('-d', '--data', help=default('Dataset to use'), choices=['digits', 'faces'], default='digits')
   parser.add_option('-t', '--training', help=default('The size of the training set'), default=100, type="int")
-  parser.add_option('-f', '--features', help=default('Whether to use enhanced features'), default=False, action="store_true")
-  parser.add_option('-o', '--odds', help=default('Whether to compute odds ratios'), default=False, action="store_true")
-  parser.add_option('-1', '--label1', help=default("First label in an odds ratio comparison"), default=0, type="int")
-  parser.add_option('-2', '--label2', help=default("Second label in an odds ratio comparison"), default=1, type="int")
   parser.add_option('-w', '--weights', help=default('Whether to print weights'), default=False, action="store_true")
-  parser.add_option('-k', '--smoothing', help=default("Smoothing parameter (ignored when using --autotune)"), type="float", default=2.0)
-  parser.add_option('-a', '--autotune', help=default("Whether to automatically tune hyperparameters"), default=False, action="store_true")
   parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=5, type="int")
   parser.add_option('-s', '--test', help=default("Amount of test data to use"), default=TEST_SET_SIZE, type="int")
+  parser.add_option('-p', '--prime', help=default("Whether to use prime weight files"), choices=['', 'prime'], default='')
 
   options, otherjunk = parser.parse_args(argv)
   if len(otherjunk) != 0: raise Exception('Command line input not understood: ' + str(otherjunk))
@@ -195,25 +157,14 @@ def readCommand(argv):
   print("--------------------")
   print("data:\t\t" + options.data)
   print("classifier:\t\t" + options.classifier)
-  if not options.classifier == 'minicontest':
-    print("using enhanced features?:\t" + str(options.features))
-  else:
-    print("using minicontest feature extractor")
+  
   print("training set size:\t" + str(options.training))
   if(options.data=="digits"):
     printImage = ImagePrinter(DIGIT_DATUM_WIDTH, DIGIT_DATUM_HEIGHT).printImage
-    if (options.features):
-      featureFunction = enhancedFeatureExtractorDigit
-    else:
-      featureFunction = basicFeatureExtractorDigit
-    if (options.classifier == 'minicontest'):
-      featureFunction = contestFeatureExtractorDigit
+    featureFunction = basicFeatureExtractorDigit
   elif(options.data=="faces"):
     printImage = ImagePrinter(FACE_DATUM_WIDTH, FACE_DATUM_HEIGHT).printImage
-    if (options.features):
-      featureFunction = enhancedFeatureExtractorFace
-    else:
-      featureFunction = basicFeatureExtractorFace      
+    featureFunction = basicFeatureExtractorFace
   else:
     print("Unknown dataset", options.data)
     print(USAGE_STRING)
@@ -227,29 +178,7 @@ def readCommand(argv):
   if options.training <= 0:
     print(f"Training set size should be a positive integer (you provided: {options.training})")
     print(USAGE_STRING)
-    sys.exit(2)
-    
-  if options.smoothing <= 0:
-    print(f"Please provide a positive number for smoothing (you provided: {options.smoothing})")
-    print(USAGE_STRING)
-    sys.exit(2)
-    
-  if options.odds:
-    if options.label1 not in legalLabels or options.label2 not in legalLabels:
-      print(f"Didn't provide a legal labels for the odds ratio: ({options.label1},{options.label2})")
-      print(USAGE_STRING)
-      sys.exit(2)
 
-  # if(options.classifier == "mostFrequent"):
-    # classifier = mostFrequent.MostFrequentClassifier(legalLabels)
-  # elif(options.classifier == "naiveBayes" or options.classifier == "nb"):
-  #   classifier = naiveBayes.NaiveBayesClassifier(legalLabels)
-  #   classifier.setSmoothing(options.smoothing)
-  #   if (options.autotune):
-  #       print("using automatic tuning for naivebayes")
-  #       classifier.automaticTuning = True
-  #   else:
-  #       print(f"using smoothing parameter k={options.smoothing} for naivebayes")
   if(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
   # print("iterations: " + str(options.iterations))
@@ -260,16 +189,6 @@ def readCommand(argv):
   elif(options.classifier == "neural"):
     classifier = neuralnetwork.NeuralNetworkClassifier(legalLabels,options.iterations)
     print("iterations: " + str(options.iterations) + "mins")
-  # elif(options.classifier == "mira"):
-  #   classifier = mira.MiraClassifier(legalLabels, options.iterations)
-  #   if (options.autotune):
-  #       print("using automatic tuning for MIRA")
-  #       classifier.automaticTuning = True
-  #   else:
-  #       print("using default C=0.001 for MIRA")
-  # elif(options.classifier == 'minicontest'):
-  #   import minicontest
-  #   classifier = minicontest.contestClassifier(legalLabels)
   else:
     print("Unknown classifier:", options.classifier)
     print(USAGE_STRING)
@@ -279,7 +198,7 @@ def readCommand(argv):
   args['classifier'] = classifier
   args['featureFunction'] = featureFunction
   args['printImage'] = printImage
-  
+  print(f"options: {options}")
   return args, options
 
 USAGE_STRING = """
@@ -322,7 +241,8 @@ def runClassifier(args, options):
     validationLabels = samples.loadLabelsFile("digitdata/validationlabels", numTest)
     rawTestData = samples.loadDataFile("digitdata/testimages", numTest,DIGIT_DATUM_WIDTH,DIGIT_DATUM_HEIGHT)
     testLabels = samples.loadLabelsFile("digitdata/testlabels", numTest)
-    
+  
+  filename = 'prime' if options.prime == 'prime' else ''
   
   # Extract features
   print("Extracting features...")
@@ -332,7 +252,7 @@ def runClassifier(args, options):
   
   # Conduct training and testing
   print("Training...")
-  classifier.train(trainingData, trainingLabels, validationData, validationLabels)
+  classifier.train(trainingData, trainingLabels, validationData, validationLabels, filename)
   print("Validating...")
   guesses = classifier.classify(validationData)
   if isinstance(guesses, np.ndarray): correct = [np.all(guesses[i] == validationLabels[i]) for i in range(len(validationLabels))].count(True)
@@ -378,21 +298,26 @@ def runClassifier(args, options):
 
 if __name__ == '__main__':
   # Read input
-  sys.argv = ['dataClassifier.py', '-c', 'perceptron', '-d', 'digits', '-i', '15', '-t', '500']
-  testing = True
-  while testing:
-    classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
-    imagetype = input("faces or digits?\n").lower()
-    iterations = input("How many iterations would you like to run? (number of loops that will be done in training)\n").lower()
-    dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
+  if len(sys.argv) <= 1:
+    testing = True
+    while testing:
+      classifier = input("Which classifier would you like to use? (perceptron or neural)\n").lower()
+      imagetype = input("faces or digits?\n").lower()
+      dataset = input("How many images would you like to test for the dataset? (1 to 5000 for digits / 1 to 450 for faces)\n").lower()
+      iterations = input("How many epochs would you like to run? (number of loops that will be done in training)\n").lower()
+      prime = input("Would you like to use the prime weights? Yes or No (Best case test weights that were generated from a prior run and stored for use in future runs of this program)\n").lower()
+      filename = 'prime' if prime == 'yes' else ''
+      
+      sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset, '-p', filename]
+      print(f"argv: {sys.argv}")
+      args, options = readCommand(sys.argv[1:])
+      print(f'options: {options}')
+      runClassifier(args, options)
 
-    sys.argv = ['dataClassifier.py', '-c', classifier, '-d', imagetype, '-i', iterations, '-t', dataset]
-    print(f"argv: {sys.argv}")
+      check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
+      testing = True if check == 'yes' else False
+  else:
     args, options = readCommand(sys.argv[1:])
     runClassifier(args, options)
 
-    check = input("Would you like to rerun the program to test another instance? (Yes or No)\n").lower()
-    testing = True if check == 'yes' else False
-  
-  # Run classifier
-  
+  print("Program terminated.\n")  

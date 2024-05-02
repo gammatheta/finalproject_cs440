@@ -10,7 +10,10 @@ class NeuralNetworkClassifier:
     def __init__(self, legalLabels, max_iterations):
         self.legalLabels = legalLabels
         self.type = "neuralnetwork"
-        self.max_iterations = max_iterations
+        if max_iterations == 0:
+            self.max_iterations = 1
+        else:
+            self.max_iterations = max_iterations
         self.bias1 = 0.1
         self.bias2 = 0.2
         self.hidden_layer = []
@@ -18,21 +21,28 @@ class NeuralNetworkClassifier:
         self.weights1 = np.array([])
         self.weights2 = np.array([])
 
-    def train(self, trainingData, trainingLabels, validationData, validationLabels):        
+    def train(self, trainingData, trainingLabels, validationData, validationLabels, filename):        
         training_arr = self.counter_to_array(list(trainingData)) # converts training data into a numpy array to perform numpy operations with data
         datasize = training_arr.shape[0]
         pixel_size = training_arr.shape[1]
         hidden_size = 512 # amount of neurons for the hidden layer
         output_size = len(self.legalLabels)
         bin_tlabels = self.to_binary(trainingLabels)
-        weights1file = 'neuralfacesweights1.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights1.txt'
-        weights2file = 'neuralfacesweights2.txt' if training_arr.shape[1] > 784 else 'neuraldigitsweights2.txt'
+
+        using_prime = True if len(filename) > 0 else False
 
         # initialization of weights
-        # self.weights1 = np.loadtxt(weights1file, delimiter=' ')
-        # self.weights2 = np.loadtxt(weights2file, delimiter=' ')
-        self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
-        self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
+       
+        if using_prime:
+            print("using prime")
+            weights1file = 'primeneuralfacesweights1.txt' if training_arr.shape[1] > 784 else 'primeneuraldigitsweights1.txt'
+            weights2file = 'primeneuralfacesweights2.txt' if training_arr.shape[1] > 784 else 'primeneuraldigitsweights2.txt'
+            self.weights1 = np.loadtxt(weights1file, delimiter=' ')
+            self.weights2 = np.loadtxt(weights2file, delimiter=' ')
+        else:
+            print("not using prime")
+            self.weights1 = np.random.randn(hidden_size,pixel_size) * np.sqrt(2 / hidden_size)
+            self.weights2 = np.random.randn(output_size,hidden_size) * np.sqrt(2 / hidden_size)
 
         # countdown = time.time() + (self.max_iterations * 60)
         end_time = 'inf'
@@ -68,9 +78,9 @@ class NeuralNetworkClassifier:
             '''
         end_time = time.time()
         time_diff = int(end_time - initial_time)
-        correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
+        # correct = [np.all(guesses[i] == trainingLabels[i]) for i in range(len(trainingLabels))].count(True)
 
-        print(f"Training finished after {iterations} iterations with {correct} correct out of {len(training_arr)} correct predictions.")
+        # print(f"Training finished after {iterations} iterations with {correct} correct out of {len(training_arr)} correct predictions.")
         print(f"Time elapsed: {time_diff} seconds")
         # np.savetxt(weights1file, self.weights1, fmt='%f', delimiter=' ')
         # np.savetxt(weights2file, self.weights2, fmt='%f', delimiter=' ')
